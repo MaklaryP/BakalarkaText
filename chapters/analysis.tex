@@ -82,10 +82,29 @@ Ich implementácia predstavuje významné inžinierske výzvy v dôsledku rozsah
 
 
 \section{Použitie Web Crawlera}
+\subsection{Použitie v priemysle}
 Web Crawleri sú dôležitou súčasťou internetových vyhľadávačov, kde slúžia na zozbieranie korpusu webových stránok indexovaných vyhľadávačom. Pri čom nie je dôležitý iba obsah stránok ale aj vzťahy medzi nimi. Okrem toho sa používajú v mnohých ďalších aplikáciách, ktoré spracovávajú veľké množstvá webových stránok, ako sú ťažby dát z webov, porovnávacie nákupné enginy \footnote{ napríklad \url{https://www.heureka.sk/}} (comparison shopping engines). \cite{encykOfDatabases}.  
 
 Taktiež na analýzu konkurencie pre dynamické určovanie ceny produktov. Napríklad úprava ceny na základe obsadenosti vstupných lístkov u resalarov (aero-linky). 
-Môžu byť použité tiež na monitorovanie zmien a automatickú údržbu web-stránok, zber dát pre výskum a sledovanie trendov v spravodajstve. 
+Môžu byť použité tiež na monitorovanie zmien a automatickú údržbu web-stránok. A to napríklad identifikovaním nefunkčných adries, kontrola generovanáho obsahu, nedosiahnuteľných assetov a monitorovanie výkonu stránky. \cite{crawlPageTesting}
+
+\subsection{Použitie vo výskume}
+Crawler je vhodným nástrojom na získavanie dát pre výskumné účely. Pomocou neho môžu vedci zbierať veľké množstvá dát. Tie môžu neskôr analyzovať a použiť na svoje výskumné účely. Crawler dokáže tieto dáta získať rýchlo a efektívne, čo umožňuje výskumníkom analyzovať trendy a vzory a vytvárať závery na základe veľkého množstva dát. Pre ilustrácii vymenujeme zopár praktických využití vo výskume. 
+
+\textbf{Analýza sociálnych sieti a médii} ako Instagram, Facebook, Twitter, Reddit, Youtube a pod. Obsahy príspevok, komentárov, množstvo reakcii, dokonca aj multimédia ako fotky a videá sú zaujímavé dáta potrebné pre sledovanie nálad a trendov v spoločnosti. Na prípravu datasetov na tieto účely je vhodný crawler zameraný na konkrétne web stránky, v tomto prípade stránky sociálnych médii. Napríklad projekt SocialNetCrawler zbiera dáta na analýzu radikalizácie a extremizácie populácie \cite{socialNetCrawler}.
+
+\textbf{Jazykoveda} pri skúmaní vývoja jazyka v 21. storočí potrebuje texty nie len z tlačených médii ale aj z online zdrojov. 
+
+\textbf{Umelá inteligencia} potrebuje byť netrénovaná na obrovských datasetoch. Práve na ich prípravu sa môže hodiť crawler. Napríklad zozbieranie otázok a odpovedí zo stránky Stack Overflow, za účelom vytrénovania AI chat bota. \cite{stackOverflowCrawl}
+
+\subsection{Použitie v oblasti spravodajských webov}
+Typickým príkladom zdieľanie článkov z rôznych spravodajských webov. Napríklad služba Google news\footnote{https://news.google.com/}. Táto a jej podobné služby prehľadávajú spravodajské weby a odporúčajú články používateľovi na základe jeho histórie a tém záujmu. Ak článok nie je kategorizovaný, využíva sa NLP (Natural language processing) na extrahovanie tém článkov (topic extraction/classification). Takto sa vedia obohatiť články o ďalšie informácie nevyskytujúce sa priamo na pozorovanej stránke.
+
+Agregácia správ v reálnom čase, pri ktorej je potrebné za čo najkratší čas zozbierať a užívateľovi zobraziť informácie z vybranej skupiny stránok. Napríklad prehľad športových výsledkov. 
+
+Crawlovanie sa používa pri identifikácii nekvalitných článkov - falošné správy a hoaxy.\cite{fakeNews} Okrem textov sa skúma aj zdrojovanie a prepojenia medzi stránkami. Toto použitie demonštruje dôležitosť získavania nie len obsahu stránok ale aj vzťahov medzi nimi, tie crawler dokáže spracovať do vhodnej formy pre analýzu. Napríklad do grafovej databázy. 
+
+
 
 \section{Základný algoritmus crawlovania}
 Najjednoduchší algoritmus je sekvenčný, slúži ako základ pre zložitejšie algoritmy využívajúce paralelizmus. 
@@ -134,7 +153,7 @@ vedieť prispôsobiť.
 
 \textbf{Prioritizácia} - aplikovanie politiky výberu.
 
-\textbf{Aktuálnosť} - aplikovanie znovu navštívenia.
+\textbf{Aktuálnosť} - aplikovanie politiky znovu navštívenia.
 
 \textbf{Rozšíriteľnosť} - systém potrebuje spracovávať nové dátové formáty a protokoly. Architektúra by preto mala byť modulárna. 
 
@@ -142,3 +161,10 @@ vedieť prispôsobiť.
 
 
 \section{Existujúce crawlery pre naše použitie} \todo{asi premenovat}
+
+Ako sme spomínali, cieľom je zozbieranie dát zo spravodajských webov na ich následné analyzovanie. To bude uskutočnené open-source nástrojmi Apache Spark a Apache OpenNLP. Tieto nástroje bežia na JVM (Java Virtual Machine). Uvedomujeme si, že máme malé zdroje na prevádzku. Preto potrebujeme open-source, ľahko udržiavané lightweight riešenie.
+
+Scrapy 
+Crawler4j
+Apache Nutch 
+
