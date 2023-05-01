@@ -10,9 +10,10 @@ Nami vytvorený crawler bude zbierať dáta z vybraných slovenských spravodajs
 \subsection{Analyzovanie zozbieraných dát}
 Analýza dát nie je súčasťou a zameraním tejto práce. Jej popísanie, pre účely návrhu crawlera, považujeme za dôležité.
 
-Dáta na analýzu budú konzumované ETL pipelinou postavenou nad Apache Sparkom prípadne nad platformou Databricks (cloudová nadstavba Sparku). Očistené dáta budu analyzované Apache nástrojmi SparkML (Machine learning) a OpenNLP (natural language processing).
+Dáta na analýzu budú konzumované ETL pipelinou postavenou nad Apache Sparkom (verzia 3.4.0) prípadne nad platformou Databricks (cloudová nadstavba Sparku). Očistené dáta budu analyzované Apache nástrojmi SparkML (Machine learning) a OpenNLP (natural language processing). Tie sú implementované v jazyku Scala a Java, bežiace na JVM (Java Virtual Machine).
 
-Tieto frameworky podporujú jazyky Java, Scala, Python a R. Scalu považujeme za jasného favorita na budovanie robustných ETL procesov. A to hlavne vďaka jej plnej podpore a dobrej integrácii funkcionálnej paradigmy. Preto bude použitá v tejto časti.
+
+Tieto frameworky podporujú jazyky Java, Scala, Python a R. Scalu považujeme za jasného favorita na budovanie robustných ETL procesov. A to hlavne vďaka jej plnej podpore a dobrej integrácii funkcionálnej paradigmy. Preto bude použitá v tejto časti a správca systému ho musí ovládať na dostatočnej úrovni.
 
 Pre tento ETL proces uloženie dát v relačnej ani inej databáze neprináša žiadne benefity oproti uloženiu v jednom alebo viacerých klasických súboroch ako CSV, Parquet a podobne. 
 
@@ -72,8 +73,68 @@ Očakávané úlohy údržby: \todo{formátovanie aby pekne sedelo}
 Ako sme spomínali, očakávame úpravu požadovaných dát. Ako aj zbieranie doménovo unikátnych dát, teda dáta, ktoré nebudú musieť byť extrahované z celého korpusu prehľadávaných článkov (napr. komentáre článku). Neprekáža nám jednotný dátový formát, s neplatnými hodnotami v miestach nepodarenej extrakcie. 
 Považujeme to za jedno z hlavných miest možného rozširovania systému, teda tieto zmeny musia byť robené rýchlo a jednoducho. 
 
+\section{Vybrané technológie a prístup}
+V tejto sekcii vyberieme technológie a jazyk, v ktorom vybydujeme náš crawler. Na základe toho navrhneme v ďalšej sekcii architektúru. 
+
+Nie je našim cieľom vytvoriť distribuovaný, škálovateľný a vysoko výkonný crawlovací systém. Cieľom je jednoduché, nenáročné riešenie zamerané na úzky výber webových stránok. Bežiace raz za relatívne veľký časový úsek (plánujeme raz za mesiac). Teda nepôjde o kontinuálne crawlovanie, so zárukou čerstvosti dát. 
+
+V požiadavkách je kladený dôraz na nízku komplexitu riešenia ako aj jednoduchosť nasadenia. Navrhujeme preto systém s čo najmenej funkcionalitami, splňujúci zadané potreby. Preto, ak sa to dá, chceme sa vyhnúť robustným frameworkom. 
+
+\subsection{Výber jazyka}
+Výsledný program bude bežať v tom istom prostredí ako program určený na analýzu zozbieraných dát. Z popisu kontextu nasadenia vyplýva prítomnosť JVM a nutná znalosť jazyka Scaly správcom. Pre úplnosť chceme zdôrazniť, že Scala sa kompiluje do Java byte kódu, spustiteľnom na JVM.
+
+Využitím JVM a jazyka Scala aj v našom riešení sa vyhneme zvyšovaniu nárokov na správcu systému a na infraštruktúru. Ďalším benefitom je dizajn JVM, prispôsobeného na robustné aplikácie s dlhým až nepretržitým behom. Ako napríklad web server. 
+
+Scala má vhodnú úroveň abstrakcie pre naše potreby, vysokú expresívnosť a plne podporuje funkcionálnu paradigmu. Tá vyniká v aplikáciach s vysokou paralelizáciou a dôrazom na dáta. Čo je aj naše použitie. 
+
+Pre tieto dôvody ju vyberáme ako jazyk, s ktorým vybudujeme náš crawler. Kedže považujeme za benefitné použiť ten istý jazyk pre obe časti celkového riešenia, potrebuje v našom riešení použiť rovnakú verziu ako použije analytická časť. Použitá verzia Sparku - 3.4.0, podporuje JVM verziu 8/11/17 a Scalu 2.12/2.13. Nevidíme, žiadne podstatné rozdieli medzi týmito dvoma podporovanými verziami. Použijeme 2.12. \todo{zdroj na dokumentaciu https://spark.apache.org/docs/latest/}
+
+\subsection{Výber technológie}
 
 
-\section{Ukladanie dat}
-Pre naše účely sú ACID vlastnosti zbytočné. Momentálne nevieme o výhode Preto navrhujeme aby crawler extrahované dáta ukladal do týchto súborov. 
+Pre Scalu existuje zopár knižníc na tvorbu crawlera. Sú postavené na mohutnom frameworku Akka alebo na funkcionálnych streamoch. 
+
+Akka je dizajnovaná pre vysoko efektívny a distribuovaný systém. Nevieme si obhájiť jej použitie za cenu zvýšených nárokom na nasadenie a údržbu. 
+
+Funkcionálne streamy sú vybodované nad knižnicou Cats. Ide o knižnicu poskytujúcu abstrakcie z teórie kategórii. Vyžaduje pokročilú znalosť funkcionálneho programovania. 
+
+Zvolenie týchto riešení neprinesie pridanú hodnotu, vyrovnavajúcu výrazne zvýšenie nárokov na schopnosti správcu a komplexitu riešenia. Preto ich nepoužijeme. Myslíme si, že centralizovaný, teda nedistribuovaný crawler vybudovaný bežnými knižnicami a abstrakciami Scaly, bude dostačovať nášmu použitiu. Práve túto hypotézu si chceme overiť touto prácou.  
+
+\subsection{Výber spôsobu ukladania extrahovaných dát}
+Pre navrhnutie architektúry je potrebné si stanoviť ako a kde chceme ukladať extrahované dáta. 
+
+Prvá, typická možnosť na zváženie je \textbf{relačná databáza}. Očakávame pravidelné zmeny schémy ukladaných dát a chceme aby proces s tým spojený bol čo najmenej pracný. Relačné databázy typicky vyžadujú manuálnu úpravu schémy. Ich výhoda je záruka ACID vlastností a flexibilné dotazovanie. Pri dodržaní normálnych foriem dosiahneme deduplikovania hodnôt ako autor, dátum vydania, doména a pod. 
+
+\textbf{NoSql} databázy riešia problém s pracným menením schémy ale vyžadujú prispôsobenie schémy predpokladaným dotazom. Keďže nepoznáme potreby analýzy, nevieme ani aké dotazy by boli požadované. 
+
+Tretia možnosť je ukladanie do \textbf{CSV} alebo do efektívnejších formátov ako napríklad \textbf{Parquet}. Oproti predchádzajúcim možnostiam je zložitosť infraštruktúry výrazne nižšia, čo je jedna z hlavných požiadaviek. 
+
+Crawler nebude dáta čítať, bude ich iba zapisovať. ETL proces, spracuvavajúci dáta na analýzu sa spustí až po jeho dobehnutí. Teda nemusíme sa obávať problémov so súbežným prístupom k dátam. Preto sú ACID vlastnosti nepotrebné.
+
+Aktuálne požiadavky na systém budú rovnako splnené aj bez použitia databázového systému, teda ukladaním jednoduchých súborov priamo na súborový systém. Vyberáme si teda toto, menej komplexné a plne dostačujúce riešenie. 
+
+
+
+\section{Návrh architektúry}
+
+Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}\todo{Opravit cross referenciu}. Pridáva paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. 
+
+Hlavné moduly crawlera sú fronta, extraktor, plánovač práce, a repozitár. 
+
+\subsection{Plánovač práce}
+Tento modul je zodpovedný za rozdeľovanie práce iným modulom a paralelizáciu roboty. 
+
+\subsection{Fronta}
+Fronta drží informácie o URL adresách na navštívenie ako aj už spracované adresy. Adresy na navštívenie poskytuje zvyšku systému na požiadanie. Zaručuje deduplikáciu, teda aby sme nenavštevovali jednu adresu viac krát. 
+
+Jej obsah môže byť väčší ako operačná pamät a nevieme akú technológiu perzistovania zvolíme. \todo{Aku technologiu perzistovania sme zvolili}
+
+Musí byť odolná na pády systému a byť schopná obnovenia do stavu pred pádom. Preto jej bude musí byť poskytnutá aj informácia o podarenom prejdení stránok až po uložení extrahovaných dát z nich do repozitára. 
+
+\subsection{Zvysok}
+
+\todo{sekvencny diagram komunikacia systemu s frontou, ukladanie do cieloveho miesta}
+
+
+Plánovač práce je zodpovedný 
 

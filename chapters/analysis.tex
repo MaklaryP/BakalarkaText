@@ -81,7 +81,7 @@ Web Crawler, tiež nazývaný ako Spider, je webový bot, ktorý na základe jed
 
 Ich implementácia predstavuje významné inžinierske výzvy v dôsledku rozsahu internetu. Na to, aby prešli podstatnú časť "povrchového webu" v primeranej dobe, musia Web Crawleri sťahovať tisíce stránok za sekundu a zvyčajne sú distribuované na desiatky alebo stovky počítačov. Ich dve hlavné dátové štruktúry - fronta sada URL adries, ktoré ešte neboli prehliadané, a sada objavených URL adries - zvyčajne nevojdú do hlavnej pamäte, takže je potrebné používať efektívne reprezentácie na disku. \cite{encykOfDatabases}
 
-\subsection{Základný algoritmus crawlovania}
+\subsection{Základný algoritmus crawlovania}\label{sub:zakladnyAlgoritmusCrawlovania}
 Najjednoduchší algoritmus je sekvenčný, slúži ako základ pre zložitejšie algoritmy využívajúce paralelizmus. 
 
 Algoritmus začína pridaním štartovacích URL adries do fronty. Po jednej sťahuje webové stránky priradené k týmto adresám. Extrahuje z nich URL adresy. Tie pridáva do fronty a stiahnuté stránky ukladá do repozitára.
