@@ -1,8 +1,79 @@
 % !TEX root = ../thesis.tex
 
-\chapter{Syntetická časť}
+\chapter{Návrh riešenia}
 \label{methodology}
 
-Syntetická časť opisuje metódy použité na syntézu riešenia a opisuje syntézu samotného riešenia (zvyčajne je to návrh/implementácia softvérového resp. hardvérového riešenia), pričom sa opiera o~závery analytickej časti práce. Začína od toho, ako sa bude riešenie používať: najdôležitejšie scenáre používania a používateľské rozhranie, ktoré bude tieto scenáre efektívne podporovať. Až potom je na rade vnútorná architektúra alebo použité technológie. Syntetická časť tvorí zvyčajne ½ jadra práce.
+\section{Kontext využitia}
 
-Syntetickú časť práce vhodne rozdeľte do kapitol a pomenujte ich podľa toho, čomu sú venované.
+Nami vytvorený crawler bude zbierať dáta z vybraných slovenských spravodajských webov. Relevantné dáta uloží vo vhodnej forme pre následnú analýzu. Interagovať s ním bude iba jeden správca, schopný upravovať jeho kód. Riešenie teda nevyžaduje flexibilitu, zameriavame sa na jedno konkrétne použitie. 
+
+\subsection{Analyzovanie zozbieraných dát}
+Analýza dát nie je súčasťou a zameraním tejto práce. Jej popísanie, pre účely návrhu crawlera, považujeme za dôležité.
+
+Dáta na analýzu budú konzumované ETL pipelinou postavenou nad Apache Sparkom prípadne nad platformou Databricks (cloudová nadstavba Sparku). Očistené dáta budu analyzované Apache nástrojmi SparkML (Machine learning) a OpenNLP (natural language processing).
+
+Tieto frameworky podporujú jazyky Java, Scala, Python a R. Scalu považujeme za jasného favorita na budovanie robustných ETL procesov. A to hlavne vďaka jej plnej podpore a dobrej integrácii funkcionálnej paradigmy. Preto bude použitá v tejto časti.
+
+Pre tento ETL proces uloženie dát v relačnej ani inej databáze neprináša žiadne benefity oproti uloženiu v jednom alebo viacerých klasických súboroch ako CSV, Parquet a podobne. 
+
+Predpokladané zameranie analýzy bude sledovanie trendov, sentiment spoločnosti, klasifikácia do tém alebo identifikovanie najrelevantnejších článkov, napríklad pomocou backlink analýzy. 
+
+V čase navrhovania crawlera, nám nie je detailne známe aké dáta si bude vyžadovať analýza. Považujeme to za miesto potencionálneho rozširovania funkcionality. 
+
+\subsection{Nasadenie a zdroje}
+Crawler by mal byť spúšťaný pravidelne, predpokladáme raz za mesiac. Prejsť by mal zopár slovenských spravodajských webov a zozbierať dáta na nasledujúce analyzovanie. 
+
+Zdroje na infraštruktúru a údržbu sú veľmi malé. Predpokladáme, jedného správcu, s pár hodinami času do mesiaca. To musíme zohľadniť pri voľbe komplexnosti riešenia. 
+
+Výpočtové a finančné zdroje sú taktiež minimalistické. Predpokladáme, že minimálne zber dát bude nasadený vo virtuálnom operačnom systéme bežiacom na fakultnom serveri. 
+
+
+
+\section{Požiadavky}
+
+\subsection{Paralelizmus}
+Čakanie na odpoveď servera je hlavné výkonnostné obmedzenie. Preto požadujeme aby systém spracovával stránky paralelne. Týmto výrazne zvýšime efektívnosť a výkonnosť crawlera. 
+
+\subsection{Odolnosť voči pádom}
+Predpokladáme, že systém bude bežať pár desiatok hodín. Nevieme zaručiť spoľahlivosť prostredia, v ktorom bude nasadený. Preto musíme rátať s možnými pádmi celého systému. 
+
+Nechceme mrhať zdrojmi a časom, preto vyžadujeme aby systém bol schopný pokračovať v mieste kde skončil. Minimálne pokračovanie od posledného kontrolného bodu (checkpoint).
+
+V ideálnom prípade by tento zotavovací mechanizmus mal byť nezávislí od prostredia. A zotaviť systém aj po preinštalovaní virtuálneho OS. Napríklad využitie služby DaaS (database as a service). Chápeme ale požiadavku na nízke náklady, ľahké nasadenie a jednoduchú údržbu. Preto sa uspokojíme aj s riešením v rámci jedného OS. Ale chceme aby riešenie bolo možné ľahko modifikovať na externý systém ukladania kontrolných bodov.
+
+Za vhodné považujeme aj logovanie s nastaviteľnou úrovňou, pre zjednodušenie hľadania možných chýb.
+
+\subsection{Obmedzená doména}
+Zameriavame sa na extrahovanie dát z vybranej skupiny spravodajských webov. Túto skupinu chceme jednoducho upravovať, či už pridávať nové zdroje alebo redukovať existujúce. Táto časť riešenia by mala byť otvorená rozširovaniu. 
+
+\subsection{Nízka komplexita, jednoduché nasadenie a údržba}
+Potrebujeme aby systém bol ľahko udržateľný a nasaditeľný. Preto požadujeme aby systém bol čo najmenej komplexný. Znížená robustnosť a menej dostupných funkcionalít nám neprekáža. Potrebujeme najjednoduchšie riešenie čo zvládne vyriešiť náš problém, s čo najmenej zdrojmi (lightweight software). 
+
+Očakávané úlohy údržby: \todo{formátovanie aby pekne sedelo}
+\begin{itemize}
+  \item Pridávanie a odoberanie cieľových domén.
+  \item Oprava chýb.
+  \item Úprava formátu a cieľa zozbieraných dát.
+  \item Výber zbieraných dát.
+  \item Spúšťanie nasadeného riešenia. 
+\end{itemize}
+
+
+\subsection{Požadované dáta na extrakciu}
+\begin{itemize}
+  \item Názov článku
+  \item Úvodný paragraf, zhrňujúci článok.
+  \item Hlavná časť článku.
+  \item Mená autorov.
+  \item Deň vydania. 
+  \item Deň poslednej modifikácie.
+\end{itemize}
+
+Ako sme spomínali, očakávame úpravu požadovaných dát. Ako aj zbieranie doménovo unikátnych dát, teda dáta, ktoré nebudú musieť byť extrahované z celého korpusu prehľadávaných článkov (napr. komentáre článku). Neprekáža nám jednotný dátový formát, s neplatnými hodnotami v miestach nepodarenej extrakcie. 
+Považujeme to za jedno z hlavných miest možného rozširovania systému, teda tieto zmeny musia byť robené rýchlo a jednoducho. 
+
+
+
+\section{Ukladanie dat}
+Pre naše účely sú ACID vlastnosti zbytočné. Momentálne nevieme o výhode Preto navrhujeme aby crawler extrahované dáta ukladal do týchto súborov. 
+
