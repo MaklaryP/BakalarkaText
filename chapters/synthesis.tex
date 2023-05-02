@@ -35,7 +35,7 @@ Výpočtové a finančné zdroje sú taktiež minimalistické. Predpokladáme, �
 \subsection{Paralelizmus}
 Čakanie na odpoveď servera je hlavné výkonnostné obmedzenie. Preto požadujeme aby systém spracovával stránky paralelne. Týmto výrazne zvýšime efektívnosť a výkonnosť crawlera. 
 
-\subsection{Odolnosť voči pádom}
+\subsection{Odolnosť voči pádom} \label{sec:reqFailRecovery}
 Predpokladáme, že systém bude bežať pár desiatok hodín. Nevieme zaručiť spoľahlivosť prostredia, v ktorom bude nasadený. Preto musíme rátať s možnými pádmi celého systému. 
 
 Nechceme mrhať zdrojmi a časom, preto vyžadujeme aby systém bol schopný pokračovať v mieste kde skončil. Minimálne pokračovanie od posledného kontrolného bodu (checkpoint).
@@ -100,7 +100,7 @@ Funkcionálne streamy sú vybodované nad knižnicou Cats. Ide o knižnicu posky
 
 Zvolenie týchto riešení neprinesie pridanú hodnotu, vyrovnavajúcu výrazne zvýšenie nárokov na schopnosti správcu a komplexitu riešenia. Preto ich nepoužijeme. Myslíme si, že centralizovaný, teda nedistribuovaný crawler vybudovaný bežnými knižnicami a abstrakciami Scaly, bude dostačovať nášmu použitiu. Práve túto hypotézu si chceme overiť touto prácou.  
 
-\subsection{Výber spôsobu ukladania extrahovaných dát}
+\subsection{Výber spôsobu ukladania extrahovaných dát} \label{subsec:pickSaving}
 Pre navrhnutie architektúry je potrebné si stanoviť ako a kde chceme ukladať extrahované dáta. 
 
 Prvá, typická možnosť na zváženie je \textbf{relačná databáza}. Očakávame pravidelné zmeny schémy ukladaných dát a chceme aby proces s tým spojený bol čo najmenej pracný. Relačné databázy typicky vyžadujú manuálnu úpravu schémy. Ich výhoda je záruka ACID vlastností a flexibilné dotazovanie. Pri dodržaní normálnych foriem dosiahneme deduplikovania hodnôt ako autor, dátum vydania, doména a pod. 
@@ -117,24 +117,43 @@ Aktuálne požiadavky na systém budú rovnako splnené aj bez použitia databá
 
 \section{Návrh architektúry}
 
-Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}\todo{Opravit cross referenciu}. Pridáva paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. 
+Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}\todo{Opravit cross referenciu}. Pridáva hlavne paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. Hlavné moduly crawlera sú  extraktor, orchestrátor, repozitár a URL manažér (ďalej ako UM). 
 
-Hlavné moduly crawlera sú fronta, extraktor, plánovač práce, a repozitár. 
+\subsection{Orchestrátor}
+Tento modul je zodpovedný  za paralelizáciu a integrovanie ďalších modulov. Stránky prechádza po krokoch, tie môžeme v zmysle požiadaviek nazvať checkpointy. Od UM dostane časť práce na jeden krok, teda kolekciu URL adries. Túto časť rozdelí pracujúcim vetvám (threads) na časti (chunky) a čaká kým dokončia svoju prácu. 
 
-\subsection{Plánovač práce}
-Tento modul je zodpovedný za rozdeľovanie práce iným modulom a paralelizáciu roboty. 
+Následne agreguje výsledky navštívenia stránok. Do repozitára zapíše extrahované dáta. Druhú čast výsledku, URL nachádzajúce sa na navštívených stránkach, zapíše do UM. Nakoniec zapíše do UM v tomto kroku navštívené adresy. Týmto sa končí krok behu crawlera.
 
-\subsection{Fronta}
-Fronta drží informácie o URL adresách na navštívenie ako aj už spracované adresy. Adresy na navštívenie poskytuje zvyšku systému na požiadanie. Zaručuje deduplikáciu, teda aby sme nenavštevovali jednu adresu viac krát. 
+Keďže najprv zapisujeme do repozitára a až potom do fronty zodpovednej za obnovu stavu výpočtu po páde programu, sme nútení zopakovať maximálne jeden krok. Čím splníme požiadavku v sekcii \ref{sec:reqFailRecovery}. Môže nastať duplicitný zápis do repozitára v kroku, v ktorom padol program. To musíme zvážiť pri navrhovaní a implementovaní repozitára. 
 
-Jej obsah môže byť väčší ako operačná pamät a nevieme akú technológiu perzistovania zvolíme. \todo{Aku technologiu perzistovania sme zvolili}
+\subsection{URL Manažér}
+Jeho zodpovednosť je poskytnúť URL adresy na navštívenie a to bez opakovania. Taktiež byť odolný voči pádom a reštartom ako je požadované v ref{sec:reqFailRecovery}.
 
-Musí byť odolná na pády systému a byť schopná obnovenia do stavu pred pádom. Preto jej bude musí byť poskytnutá aj informácia o podarenom prejdení stránok až po uložení extrahovaných dát z nich do repozitára. 
-
-\subsection{Zvysok}
-
-\todo{sekvencny diagram komunikacia systemu s frontou, ukladanie do cieloveho miesta}
+Jeho obsah môže byť väčší ako operačná pamäť a v spojení s požiadavkou \ref{sec:reqFailRecovery} musíme jeho stav ukladať v externom úložisku. Môže ísť o malú súborovú databázu alebo obyčajný súbor. Pre potreby testovania a rýchleho vývoja navrhujeme implementovať aj UM nezávislé na externom úložisku. To ale bude podrobne riešiť v implementačnej časti. 
 
 
-Plánovač práce je zodpovedný 
+\todo{Navrhnutie aky externy system pouzijeme}
+
+
+\subsection{Repozitár}
+Tento modul je zodpovedný za uloženie extrahovaných dát pre následnú analýzu. 
+
+Z troch porovnaných možností v časti \ref{subsec:pickSaving} sme vybrali ukladanie do obyčajného súboru. Máme možnosti CSV alebo Parquet. 
+
+Perquet je stĺpcovo orientovaný, s optimalizáciou prázdnych hodnôt. To umožňuje rýchlejšie čítanie konkrétnych stĺpcov. ETL proces konzumujúci naše dáta bude čítať celý súbor. Preto nám použitie tohto súboru neprináša osoh. Naopak jeho použitím zvýšime komplexitu riešenia. Preto budeme ukladať do CSV súborov priamo na súborový systém. 
+
+Ako sme spomínali, prijali sme riziko dvojitého zápisu jedného kroku po reštarte systému. ETL proces bude pripravovať na analýzu, transformáciami, čistením a deduplikovaním. Nemáme veľký dôvod to teda riešiť aj v našom riešení. Musíme ale podotknúť nutnosť vynechať pri deduplikovaní stĺpec - Čas navštívenia, inak záznamy vzniknuté extrahovaním tej istej stránky v rozdielnom čase budú označené za chybné. 
+
+Keby sme zapisovali do jedného súboru riskujeme prekročenie limitu veľkosti systému.
+
+Každý krok preto zapíšeme do samostatného súboru, ako názov môžeme použiť napríklad časovú značku. Veľkosť súboru bude kontrolovaná veľkosťou kroku, teda počtom v ňom spracovaných adries. ETL proces bude spracovávať iba nové súbory. To dosiahne logovaním názvov spracovaných súborov alebo ich mazaním. 
+
+\subsection{Extraktor}
+Extraktor je zodpovedný za extrakciu releventných dát z navštívenej stránky ako aj extrahovanie URL adries. Extrahuje iba cieľové adresy, teda v ňom prebieha filtrovanie aké domény chceme navštíviť\todo{tu sa hodi aby sme v analyze zaviedli pojem focused crawler a cielove domeny alebo nieco podobne}. 
+
+Podpora extrakcie stránky je prevedená implementáciou tohto interfacu. Napríklad extrakcia sme.sk bude prevedená v SmeExtraktor.
+
+\todo{dopisanie sposoby filtorovania adreies a ako priraduje adrese extraktor}
+
+
 

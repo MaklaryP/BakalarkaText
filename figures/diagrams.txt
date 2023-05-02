@@ -1,0 +1,16 @@
+sequenceDiagram
+    Orchestrator->>+UrlManager: urlsToCrawlInStep(stepSize)
+    UrlManager-->>-Orchestrator: URLs
+    
+    par 
+        Orchestrator->>+Worker A: crawlChunk(chunkOfUrls)
+        Worker A-->>-Orchestrator: Partial Result
+    and
+    Orchestrator->>+Worker B: crawlChunk(chunkOfUrls)
+    Worker B-->>-Orchestrator: Partial Result
+    end
+
+    Orchestrator->>UrlManager: add(urlsFromResult)
+    Orchestrator->>Repository: save(dataFromResult)
+    
+    Orchestrator->>UrlManager: markAsVisited(URLsVisitedInThisStep)
