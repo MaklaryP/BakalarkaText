@@ -14,3 +14,88 @@ sequenceDiagram
     Orchestrator->>Repository: save(dataFromResult)
     
     Orchestrator->>UrlManager: markAsVisited(URLsVisitedInThisStep)
+
+
+===========================================================================================
+
+classDiagram
+Url <|-- UrlVisited
+UrlVisited o-- VisitState
+
+VisitResult o-- UrlVisited
+VisitResult o-- "*" Url
+VisitResult o-- Data
+
+
+class Url{
+    urlAddress: String
+}
+
+class UrlVisited{
+    visitTimestamp: Timestamp
+    visitState: VisitState
+}
+
+class VisitState{
+    <<enumeration>>
+    SUCCESS
+    FAIL
+}
+
+
+class VisitResult{
+    urlVisited: UrlVisited
+    childUrl: List[Url]
+    extractedData: Data
+}
+
+class Data{
+    title: String
+    introSection: String
+    mainArticle: String
+    authors: List[String]
+    pubDate: Date
+    lastModDate: Date
+}
+
+
+===========================================================================================
+
+
+
+
+classDiagram
+
+    Crawler *-- CrawlerContext
+
+    CrawlerContext o-- Logger
+    CrawlerContext o-- Repository
+    CrawlerContext o-- UrlManager
+
+    CrawlerContext *-- PageVisitor
+    UrlManager o-- Url
+
+    class PageVisitor{
+        fun: Url => Document
+    }
+
+    class Logger{
+        <<interface>>
+    } 
+
+    class Repository{
+        <<interface>>
+    }
+
+    class UrlManager{
+        <<interface>>
+    }
+
+    class PageVisitor{
+        <<interface>>
+    }
+
+    
+    
+
+===========================================================================================

@@ -117,7 +117,15 @@ Aktuálne požiadavky na systém budú rovnako splnené aj bez použitia databá
 
 \section{Návrh architektúry}
 
-Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}\todo{Opravit cross referenciu}. Pridáva hlavne paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. Hlavné moduly crawlera sú  extraktor, orchestrátor, repozitár a URL manažér (ďalej ako UM). 
+Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}\todo{Opravit cross referenciu}. Pridáva hlavne paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. Hlavné moduly crawlera sú  extraktor, orchestrátor, repozitár a URL manažér (ďalej ako UM).  Na obrázku \ref{o:classDiagramVisitResult} sú znázornené pomocné triedy.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=.9\textwidth]{figures/classDiagramVisitResult.png}
+    \caption{Class diagram pomocných dátových štruktúr \label{o:classDiagramVisitResult}}
+\end{figure}
+
+\todo{diagram vsetkych implementacii a interfacov}
 
 \subsection{Orchestrátor}
 Tento modul je zodpovedný  za paralelizáciu a integrovanie ďalších modulov. Stránky prechádza po krokoch, tie môžeme v zmysle požiadaviek nazvať checkpointy. Od UM dostane časť práce na jeden krok, teda kolekciu URL adries. Túto časť rozdelí pracujúcim vetvám (threads) na časti (chunky) a čaká kým dokončia svoju prácu. 
@@ -126,13 +134,21 @@ Následne agreguje výsledky navštívenia stránok. Do repozitára zapíše ext
 
 Keďže najprv zapisujeme do repozitára a až potom do fronty zodpovednej za obnovu stavu výpočtu po páde programu, sme nútení zopakovať maximálne jeden krok. Čím splníme požiadavku v sekcii \ref{sec:reqFailRecovery}. Môže nastať duplicitný zápis do repozitára v kroku, v ktorom padol program. To musíme zvážiť pri navrhovaní a implementovaní repozitára. 
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=.9\textwidth]{figures/seqDiagCrawlStep.png}
+    \caption{ Sekvenčný diagram znázorňujúci jeden krok \label{o:seqDiagCrawlStep}}
+\end{figure}
+
+
+
 \subsection{URL Manažér}
 Jeho zodpovednosť je poskytnúť URL adresy na navštívenie a to bez opakovania. Taktiež byť odolný voči pádom a reštartom ako je požadované v ref{sec:reqFailRecovery}.
 
 Jeho obsah môže byť väčší ako operačná pamäť a v spojení s požiadavkou \ref{sec:reqFailRecovery} musíme jeho stav ukladať v externom úložisku. Môže ísť o malú súborovú databázu alebo obyčajný súbor. Pre potreby testovania a rýchleho vývoja navrhujeme implementovať aj UM nezávislé na externom úložisku. To ale bude podrobne riešiť v implementačnej časti. 
 
 
-\todo{Navrhnutie aky externy system pouzijeme}
+\todo{Navrhnutie aký externý systém použijeme}
 
 
 \subsection{Repozitár}
@@ -153,7 +169,50 @@ Extraktor je zodpovedný za extrakciu releventných dát z navštívenej stránk
 
 Podpora extrakcie stránky je prevedená implementáciou tohto interfacu. Napríklad extrakcia sme.sk bude prevedená v SmeExtraktor.
 
-\todo{dopisanie sposoby filtorovania adreies a ako priraduje adrese extraktor}
+\todo{dopisanie sposoby filtorovania adreies a ako priraduje adrese extraktor + diagram}
+
+\subsection{Prístup k paralelizácii}
+Môže sa naskytnúť otázka, prečo si pracujúce vlákna nepýtajú adresy priamo od UM a svoju prácu nezapisujú do repozitára, ale robia to prostredníctvom orchestrátora? V nasledujúcich odstavoch si vysvetlíme prečo sme sa tak rozhodli a aké princípy nás k tomu viedli. 
+
+Hľadanie chýb je v paralelných systémoch notoricky náročnejšie. Časť problému riešia základné princípy funkcionálneho programovania a to nemenné dátové štruktúry (immutables) a uprednostňovanie čistých funkcií (pure functions). 
+
+Používanie nemenných štruktúr nám umožní zdieľanie zdrojov medzi vláknami bez potreby synchronizácie a uzamykania. To eliminuje riziko race condition\todo{prelozit}.
+
+Čisté funkcie si vieme zjednodušene a nie úplne korektne definovať ako funkcie bez vedľajších efektov. Vedľajšími efektmi sú napríklad zápis alebo čítanie z databázy. Pre túto prácu je uvedená definícia postačujúca, nakoľko sa nezameriava na funkcionálne programovanie. \todo{Definovať lepsie mozno ked bude malo textu}. To znamená, že nepotrebujeme synchronizačné a zamykacie mechanizmy. Výrazný pridaným benefitom je jednoduché chápanie a predvídateľnosť. 
+
+Program bez vedľajších efektov ale nerobí nič užitočné, keďže nevie interagovať s prostredím. Našou snahou teda nie je úplná eliminácia ale zníženie ich počtu a ich presunutie na hranice systému. Teda snažíme sa aby jadro systému bolo zostavené z čistých funkcii a vedľajšie efekty prebiehali iba na perifériách systému, s obmedzenou komunikáciou s jadrom. Nazveme to princípom separácie.
+
+Scalu sme si vybrali aj kvôli plnej integracii funkcionálneho programovania, čo sa iných zvažovaných jazykoch povedať nedá. Preto tieto princípy uplatníme v najväčšej možnej miere. 
+
+V popise URL Manažéra sme navrhli jeho perzistovanie. Čo si ale vyžaduje vedľajšie efekty. Uplatníme princíp separácie presunieme ho na perifériu programu a obmedzíme jeho komunikáciu so zvyškom programu. Komunikuje s ním iba orchestrátor.  Rovnaké dôvody platia aj pre repozitár. 
+
+Aplikovaním týchto princípov sme zvýšili čitateľnosť programu a zlepšili testovateľnoť.  
+
+\subsection{Kontext Crawlera}
+Pre uľahčenie testovania sme separovali vedľajšie efekty do jednej triedy, nazvanej Kontext. Obaľuje repozitár, UM, loggovanie, a funkciu navštívenia stránky. Táto trieda je inicializačný parameter crawlera. Ide vlastne o injektovanie závislostí. 
+
+Pri jej inštancovaní vieme použiť rôzne implementácie spomínaných modulov a tým modifikovať správanie crawlera. Takto vieme vytvoriť prostredie pre deterministické testy. 
+
+Hlavne funkcia navštívenia stránky nám dáva plnú kontrolu nad crowlovaním pri testovaní. Parametrom je Url a výstupnou hodnotou je HTML Document. Pre každý test môžeme použiť špecifickú definíciu. Príklad takejto jednoduchej funkcie je zapísaný v pseudo kóde nižšie.
+
+\begin{lstlisting}
+//Pseudo code
+input: Url to be visited: u
+output: HTML Document
+
+if u == "https://www.sme.sk/" :
+    return SomeTestDocument
+else 
+    return invalid value
 
 
+\end{lstlisting}
 
+
+Pre testovacie účely sa môže použiť aj neperzistovaný repozitár a UM. Ide o podobnú techniku ako mockovanie\todo{PRELOZIT???} ale dosiahnutú bez reflexie. 
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=.9\textwidth]{figures/classDiagramContext.png}
+    \caption{ Class diagram Kontextu crawlera \label{o:classDiagramContext}}
+\end{figure}
