@@ -19,44 +19,56 @@ sequenceDiagram
 ===========================================================================================
 
 classDiagram
-Url <|-- UrlVisited
-UrlVisited o-- VisitState
 
-VisitResult o-- UrlVisited
-VisitResult o-- "*" Url
-VisitResult o-- Data
+    CrawlResult o-- Failed
+    CrawlResult o-- Crawled
+    Crawled o-- UrlVisitRecord
+    Crawled o-- Url
+    Crawled o-- PageContent
+    Failed o-- UrlVisitRecord
 
+    UrlVisitRecord o-- Url
 
-class Url{
-    urlAddress: String
-}
+    PageContent o-- Url
 
-class UrlVisited{
-    visitTimestamp: Timestamp
-    visitState: VisitState
-}
+    class Crawled{
+        urlVisitRecord: UrlVisitRecord
+        supportedUrlsOnPage: List[Url]
+        pageContent: PageContent
+    }
 
-class VisitState{
-    <<enumeration>>
-    SUCCESS
-    FAIL
-}
+    class Failed{
+        urlVisitRecord: UrlVisitRecord
+        errorMsg: String
+    }
 
+    class PageContent{
+        title: Option[String] 
+        authors: List[String]
+        introSection: Option[String] 
+        articleText: Option[String]
+        publishDate: Option[String] 
+        lastUpdatedDate: Option[String]
+        childArticles: List[Url]
+    }
 
-class VisitResult{
-    urlVisited: UrlVisited
-    childUrl: List[Url]
-    extractedData: Data
-}
+    class UrlVisitRecord{
+        url: Url
+        timestamp: Timestamp
+    }
 
-class Data{
-    title: String
-    introSection: String
-    mainArticle: String
-    authors: List[String]
-    pubDate: Date
-    lastModDate: Date
-}
+    class Url{
+        address: String
+    }
+
+    class CrawlResult{
+        crawled: List[Crawled]
+        failed: List[Failed]
+
+        addCrawled(Crawled): CrawlResult
+        addFailed(Failed): CrawlResult
+        ++(CrawlResult): CrawlResult
+    }
 
 
 ===========================================================================================
