@@ -34,6 +34,21 @@
 % Location of file with bibliography resources
 \addbibresource{chapters/bibliography.bib}
 
+\newcommand{\detailtexcount}[1]{%
+  \immediate\write18{texcount -merge -sum -q #1.tex output.bbl > #1.wcdetail }%
+  \verbatiminput{#1.wcdetail}%
+}
+
+\newcommand{\quickwordcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge -q #1.tex output.bbl > #1-words.sum }%
+  \input{#1-words.sum} words%
+}
+
+\newcommand{\quickcharcount}[1]{%
+  \immediate\write18{texcount -1 -sum -merge -char -q #1.tex output.bbl > #1-chars.sum }%
+  \input{#1-chars.sum} characters (not including spaces)%
+}
+
 % Variables
 %\thesisspec{figures/thesisspec.png} 
 
@@ -132,5 +147,4 @@ V neposlednom rade by som sa rád poďakoval pánom \textit{Donaldovi E. Knuthov
 %údaje, údaje o~záujmoch, účasti na~projektoch, účasti na~súťažiach,
 %získané ocenenia, zahraničné pobyty na~praxi, domácu prax, publikácie
 %a~pod.
-
 \end{document}
