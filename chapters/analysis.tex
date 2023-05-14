@@ -143,6 +143,39 @@ vedieť prispôsobiť.
 
 \textbf{Etickosť} - systém by mal rešpektovať pravidlá v robots.txt.
 
+\section{Typy web crawlerov}
+Crawlery môžeme na základe ich použitia a funkčnosti rozdeliť do základných skupín: univerzálne, vertikálne, inkrementálne, distribuované, sémantické, hĺbkové, zbierajúce dáta v reálnom čase a škodlivé. Tieto skupiny nie sú výlučné a je bežné, že crawler patrí do viacerých kategórii. Bližšie opíšeme najvýznamnejšie z nich. 
+
+\subsection{Univerzálny alebo horizontálny crawler}
+Najbežnejší typ, používaný v indexovaní širokého webu. Jeho cieľom je navštívenie čo najviac domén.
+
+Základná stratégia spočíva v uprednostňovaní adries z domén, ktoré ešte navštívil alebo ich navštívil dávno. To má za následok plytké prejdenie jednej domény. 
+
+Internet obsahuje bilióny stránok a rastie exponenciálne. Prejdenie významnej časti webu touto stratégiou si vyžaduje veľké množstvo zdrojov a masívne distribuovaný systém. 
+
+Typickým príkladom na tento druh sú crawlery na vybudovanie indexu pre internetové vyhľadávače.
+
+\subsection{Vertikálny crawler}
+Vertikálny crawler taktiež nazývaný fokusovaný crawler, je typ crawlera zameriavajúci sa na vybranú množinu stránok alebo skupinu stránok súvisiacich so skúmanou témou.
+
+Oproti horizontálnemu, používa stratégiu prehľadávania do hĺbky. Teda rovno navštevuje objavené adresy bez snahy najprv vybudovať šírku korpusu. 
+
+Vyžaduje si oveľa menej prostriedkov ako horizontálny, keďže nepotrebuje prehľadať taký mohutný korpus. Potrebuje ale dobrú sadu štartovacích adries.
+
+Podmnožina môže byť určená staticky, teda táto podmnožina sa crawlovaním nemení. Jedna z možných implementácii dynamického vertikálneho prehľadávania je určenie relevantých stránok na základe ich obsahu. Napríklad výskyt kľúčových slov, alebo odkazy na iné relevantné stránky. Ak je stránka označená za relevantnú tak crawler navštívi aj stránky odkazované touto stránkou. 
+
+\subsection{Škodlivé crawlery}
+Crawlery sa dajú použiť aj nelegálne účely. Môže ísť napríklad o hľadanie chýb v bezpečnosti web stránok, zahlcovanie nežiadúcim obsahom, kradnutím obsahu a na útoky hrubou silou. Typicky sú vysoko špecializované a teda aj vertikálne. 
+
+
+\subsection{Sémantické crawlery}
+Slúžia na extrahovanie a spracovanie informácii z webových stránok podľa princípov sémantického webu. Cieľom je pripraviť dáta do štruktúry vhodnej pre interpretovanie počítačmi. Nehovoríme o interpretácii za účelom zobrazenia užívateľovi ale za účelom strojového pochopenia ich významu a prepojenia. \cite{semanticWeb}
+
+Na extrahovanie a interpretovanie schém, ontológii a  súvislostí medzi informáciami a využívajú technológie ako RDF (Resource Description Framework), OWL (Web Ontology Language) a SPARQL (SPARQL Protocol)\cite{ontologies}.
+
+\subsection{Hĺbkové crawlery}
+Niektoré informácie v internetovom priestore nie sú voľne dostupné pre bežné crawlery. Môže ísť napríklad o privátne siete, platené stránky, stránky s potrebným prihlásením, špecifické protokoly komunikácie. Tieto informácie sú obrazne povedané pod povrchom. Práve z toho vzniklo pomenovanie tejto skupiny. 
+
 \section{Použitie Web Crawlera}
 
 \subsection{Použitie v komerčnej sfére}
