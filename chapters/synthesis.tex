@@ -32,8 +32,8 @@ Výpočtové a finančné zdroje sú taktiež minimalistické. Predpokladáme, �
 
 \section{Požiadavky}
 
-\subsection{Paralelizmus}
-Čakanie na odpoveď servera je hlavné výkonnostné obmedzenie. Preto požadujeme aby systém spracovával stránky paralelne. Týmto výrazne zvýšime efektívnosť a výkonnosť crawlera. 
+\subsection{Paralelizmus}\label{c:reqParalel}
+Čakanie na odpoveď servera je hlavné výkonnostné obmedzenie. Preto požadujeme aby systém spracovával stránky paralelne. Týmto výrazne zvýšime efektívnosť a výkonnosť crawlera. Avšak musíme sa vyhnúť zablokovaniu od serverov webstránok prekročením maximálneho povoleného počtu dotazov za úsek času Teda nepoužiť príliš veľkú paralelizáciu. 
 
 \subsection{Odolnosť voči pádom} \label{sec:reqFailRecovery}
 Predpokladáme, že systém bude bežať pár desiatok hodín. Nevieme zaručiť spoľahlivosť prostredia, v ktorom bude nasadený. Preto musíme rátať s možnými pádmi celého systému. 
@@ -44,10 +44,10 @@ V ideálnom prípade by tento zotavovací mechanizmus mal byť nezávislí od pr
 
 Za vhodné považujeme aj logovanie s nastaviteľnou úrovňou, pre zjednodušenie hľadania možných chýb.
 
-\subsection{Obmedzená doména}
+\subsection{Obmedzená doména} \label{c:reqDomain}
 Zameriavame sa na extrahovanie dát z vybranej skupiny spravodajských webov. Túto skupinu chceme jednoducho upravovať, či už pridávať nové zdroje alebo redukovať existujúce. Táto časť riešenia by mala byť otvorená rozširovaniu. 
 
-\subsection{Nízka komplexita, jednoduché nasadenie a údržba}
+\subsection{Nízka komplexita, jednoduché nasadenie a údržba} \label{c:reqKomplexity}
 Potrebujeme aby systém bol ľahko udržateľný a nasaditeľný. Preto požadujeme aby systém bol čo najmenej komplexný. Znížená robustnosť a menej dostupných funkcionalít nám neprekáža. Potrebujeme najjednoduchšie riešenie čo zvládne vyriešiť náš problém, s čo najmenej zdrojmi (lightweight software). 
 
 Očakávané úlohy údržby: \todo{formátovanie aby pekne sedelo}
@@ -60,7 +60,7 @@ Očakávané úlohy údržby: \todo{formátovanie aby pekne sedelo}
 \end{itemize}
 
 
-\subsection{Požadované dáta na extrakciu}
+\subsection{Požadované dáta na extrakciu} \label{c:reqData}
 \begin{itemize}
   \item Názov článku
   \item Úvodný paragraf, zhrňujúci článok.

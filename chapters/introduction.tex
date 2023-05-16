@@ -6,12 +6,34 @@
 
 \chapter*{Úvod}
 
-Úvod práce stručne opisuje stanovený problém, kontext problému a motiváciu pre riešenie problému. Z~úvodu by malo byť jasné, že stanovený problém doposiaľ nie je vyriešený a má zmysel ho riešiť.
-V~úvode neuvádzajte štruktúru práce, t.j. o~čom je ktorá kapitola. Rozsah úvodu je minimálne 2 celé strany (vrátane formulácie úlohy).
+Základom každej analýzy sú kvalitné dáta. Jedným zo zdrojov takýchto dát sú web stránky, kde sú však rozptýlene a uložené v nevhodnej podobe. Tento problém rieši webový crawler.
 
-Ďalšie užitočné informácie môžete nájsť v~Pokynoch pre vypracovanie záverečných prác\footnote{\url{https://moodle.fei.tuke.sk/pluginfile.php/27971/mod_resource/content/16/Instructions_v15.pdf}}.
+Motiváciou práce je príprava dát zo slovenských spravodajských webov na následnú analýzu. Existuje viacero crawlerov, nastaviteľných na získavanie dát pre tieto cieľové účely. Sú ale príliš robustné a vyžadujú si zbytočne veľa zdrojov na prevádzku. 
 
+Prínosom tejto práce je navrhnutie vlastného riešenia crawlera s modulárnou architektúrou, nízkymi nárokmi na dlhodobú prevádzku a jednoduchým pridávaním zdrojových stránok. Je schopný zotaviť sa po páde a pokračovať kde prestal. Toto riešenie je možné použiť aj pre distribuované crawlovanie, avšak každý výpočtový uzol musí skúmať unikátnu množinu domén. 
+
+Tento návrh sme implementovali a úspešne pripravili dáta do vhodnej podoby na analýzu v nástroji Apache Spark. 
+
+
+
+
+% Analyzovaním dát nachádzajúcich sa na spravodajských weboch vieme sledovať nálady v spoločnosti, identifikovať stránky šíriace lživé správy alebo skúmať vývoj slovenského jazyka. 
+
+% Na to ale najprv potrebujeme tieto dáta zozbierať a pripraviť do vhodnej podoby. 
+
+% Existuje viacero crawlerov, nastaviteľných na získavanie dát pre tieto cieľové účely. Sú ale príliš robustné a vyžadujú si zbytočne veľa zdrojov na prevádzku. 
+
+% Prínosmi tejto práce
+
+% Navrhnuté riešenie je nenáročné na údržbu, vyžaduje málo zdrojov. Je prispôsobené na dlhodobú prevádzku a odolné voči pádom. 
+
+% Distribuované počítanie sa dá dosiahnuť rozdelením domén a spustením na viacerých počítačoch. 
+
+% tejto práce je navrhnutie vlastného crawlera
+
+% a implementovanie web crawlera prispôsobeného na zbieranie informácii so spravodajských webov.  
+% The main contribution of the thesis is the design and implementation of a custom web crawler that is tailored to the needs of news websites. The crawler is designed to be highly configurable and customizable, allowing it to adapt to the specific requirements of different news sources. It is also designed to be efficient and scalable, enabling it to handle large volumes of data without impacting the performance of the target websites.
 
 \section*{Formulácia úlohy}
 
-Text záverečnej práce musí obsahovať sekciu s~formuláciou úlohy resp. úloh riešených v~rámci záverečnej práce. V~tejto časti autor rozvedie spôsob, akým budú riešené úlohy a~tézy formulované v~zadaní práce. Taktiež uvedie prehľad podmienok riešenia.
+% Text záverečnej práce musí obsahovať sekciu s~formuláciou úlohy resp. úloh riešených v~rámci záverečnej práce. V~tejto časti autor rozvedie spôsob, akým budú riešené úlohy a~tézy formulované v~zadaní práce. Taktiež uvedie prehľad podmienok riešenia.
