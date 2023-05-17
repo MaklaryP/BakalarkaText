@@ -126,7 +126,7 @@ V tomto ohľade nepovažujeme repozitár za kritický, pretože v každom kroku 
 
 Naopak Url Manažér si musí držať dáta o už navštívených adresách a v každom kroku perzistovať svoj stav. Teda s pribúdajúcimi krokmi, za zväčšuje objem dát v operačnej pamäti a tak isto objem zapisovaný do súborového systému. Na grafe \ref{o:opTimes} vidíme lineárne zvyšovanie trvania operácii Url Manažéra. 
 
-V tabubuľke \ref{t:degr} je znázornené priemerné trvania operácie označovania prejdených adries na začiatku behu programu a na konci. A ich podiel oproti priemernej dĺžke samotného crawlovanie v celom behu programu, teda časovo najnáročnejšiu operáciu. Pre behy trvajúce hodiny je to dostačujúce. Ak však potrebujeme crawler spustiť na pár dní, treba zvážiť použitie Url Manažéra s databázovým systémom. Tento problém vieme jednoducho vyriešiť rozdelením celej domény na časti a tie spustiť v samostatných inštanciách crawlera. Týmto vieme docieliť aj distribúciu na viac výpočtových jednotiek. 
+V tabubuľke \ref{t:degr} je znázornené priemerné trvania operácie označovania prejdených adries \todo{Nie je to ta operacie, je to asi pridavanie novych adries} na začiatku behu programu a na konci. A ich podiel oproti priemernej dĺžke samotného crawlovanie v celom behu programu, teda časovo najnáročnejšiu operáciu. Pre behy trvajúce hodiny je to dostačujúce. Ak však potrebujeme crawler spustiť na pár dní, treba zvážiť použitie Url Manažéra s databázovým systémom. Tento problém vieme jednoducho vyriešiť rozdelením celej domény na časti a tie spustiť v samostatných inštanciách crawlera. Týmto vieme docieliť aj distribúciu na viac výpočtových jednotiek. 
 
 Na obrázku \ref{o:crawlTimeChart} vidíme, že čas samotného crawlovania sa mimo lokálnych výkyvov nemení. Teda paralelná časť programu funguje ako bola navrhnutá. Tak isto to neindikuje blokovanie žiadostí servermi. 
 
@@ -159,7 +159,7 @@ Na obrázku \ref{o:crawlTimeChart} vidíme, že čas samotného crawlovania sa m
 
 
 
-\subsection{Počet adries na prejdenie}
+\subsection{Počet adries na prejdenie} \label{c:addInteresting}
 Očakávali sme prudký nárast adries na prejdenie v začiatku behu programu a následne stabilný lineárny pokles. To sa nepotvrdilo, na obrázku \ref{o:umSizeChart} vidíme, že v približnom strede behu, tento počet znovu začal prudko stúpať. 
 
 Hypotézou bolo že, že sme objavili adresu odkazujúcu na časť webu, ktorá je málo odkazovaná zvyškom webu. Konkrétne v našom prípade sme prechádzali aj doménu https://primar.sme.sk, ale nemali sme ju v štartovacích adresách. Teda až prvým odkazom na túto doménu sme naštartovali jej objavovanie. 
@@ -230,8 +230,3 @@ Pridaním nového extraktora pre novú doménu, implementujeme aj metódu isInDo
 Nie je potrebné nasadzovať databázu alebo iné externé systémy. Systém robí len to na čo bol nadizajnovaný a nie je zaťažený zbytočným balastom. Teda požiadavka \ref{c:reqKomplexity} je splnená. 
 
 Ako je možné vidieť v tabuľke \ref{t:agrMer}, zbieranie dát nedosahuje ideálnu úspešnosť a v ďalších iteráciách je ju potrebné zlepšiť. Nepovažujeme to za chybu dizajnu, ale za nedostatočnú optimalizáciu extraktora. Zbierame požadované dáta, preto požiadavku \ref{c:reqData} považujeme za splnenú. 
-
-\section{Splnenie cieľa práce}
-\todo{NAPISAT PO ZADEFINOVANI ULOHY PRACE}
-
-

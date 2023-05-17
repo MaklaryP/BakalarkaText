@@ -3,6 +3,23 @@
 \chapter{Záver}
 \label{summary}
 
-Záver práce obsahuje zhrnutie výsledkov práce s~jasným opisom prínosov a pôvodných (vlastných) výsledkov autora a vyhodnotenie splnenia stanovených cieľov. Je to stručné zhrnutie informácií uvedených v~záverečnej práci. Záver by nemal obsahovať nové informácie.
+% Záver práce obsahuje zhrnutie výsledkov práce s~jasným opisom prínosov a pôvodných (vlastných) výsledkov autora a vyhodnotenie splnenia stanovených cieľov. Je to stručné zhrnutie informácií uvedených v~záverečnej práci. Záver by nemal obsahovať nové informácie.
 
-V~závere by mal tiež autor poukázať na prípadné otvorené otázky, ktoré sú nad rámec rozsahu práce a mal by odporučiť ďalšie aktivity na pokračovanie pri riešení problému. Rozsah záveru je minimálne 1 celá strana.
+% V~závere by mal tiež autor poukázať na prípadné otvorené otázky, ktoré sú nad rámec rozsahu práce a mal by odporučiť ďalšie aktivity na pokračovanie pri riešení problému. Rozsah záveru je minimálne 1 celá strana.
+
+V tejto práci sme navrhli a implementovali crawler špecializovaný na zber dát zo slovenských spravodajských webov. Jeho veľkou výhodou oproti použitiu existujúcich riešení je nenáročnosť na údržbu a prevádzku a plná kontrola nad priebehom crawlovania. Je schopný dlhodobej prevádzky a je odolný voči pádom. Ak sa vyskytne chyba, vieme proces opätovne spustiť bez straty stavu crowlovania. 
+
+Architektúru sme zvolili modulárnu čím sme umožnili jednoduchú úpravu správania. Napríklad ak sa v budúcnosti rozhodneme ukladať dáta do iného formátu, implementujeme modul zodpovedný za ukladanie výsledkov a poskytneme jeho inštanciu crawleru pomocou injektovania závislostí.  
+
+Paralelizmus sme izolovali od ostatných modulov. Tie teda nemajú žiadnu paralelizačnú logiku. Vďaka tomu, je údržba nenáročná. 
+
+Program zbiera štatistiky o behu ako napríklad trvanie najdôležitejších operácii a úspešnosť extrakcie dát. Pomocou nich vieme monitorovať nasadené crawlery. 
+
+Vytvoreným riešením sme za 11 hodín zozbierali 9 gigabajtov dát z 518 000 web stránok. Na týchto dátach sme v nástroji Apache Spark vykonali jednoduchú analýzu spätných odkazov\todo{premenvat vsade}. Čím sme identifikovali aktuálne odporúčané články a články s najväčším dosahom. Týmto sme overili splnenie hlavného cieľa práce a to schopnosť zozbierať dáta na podobné účely.  
+
+Zo zozbieraných štatistík sme vyhodnotili, že naše riešenie je vhodné na behy trvajúce hodiny. Avšak po pár dňoch degraduje výkon na nežiadúcu úroveň. Je to z dôvodu ukladania prejdených adries v pamäti a ich perzistovanie na disk v každom kroku. V tomto ohľade navrhujeme pre budúce prácu upraviť perzistovanie z kompletnej serializácie v každom kroku, na perzistovanie iba inkrementov. 
+
+Pri analýze štatistík z behu sme pozorovali prerušenie poklesu adries náhlym prudkým nárastom. V kapitole \ref{c:addInteresting} sa mu povrchovo venujeme. Považujeme ho za zaujímavý úkaz hodný hlbšieho preskúmania v inej práci.  
+
+
+\todo{ked treba text - testy}
