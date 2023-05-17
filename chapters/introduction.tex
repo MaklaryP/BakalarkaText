@@ -6,13 +6,24 @@
 
 \chapter*{Úvod}
 
-Základom každej analýzy sú kvalitné dáta. Jedným zo zdrojov takýchto dát sú web stránky, kde sú však rozptýlene a uložené v nevhodnej podobe. Tento problém rieši webový crawler.
+S nástupom digitálnej doby sa objem dostupných informácii exponenciálne zväčšuje. Vzniklo množstvo spravodajských webov, publikujúce násobne väčšie množstvo článkov ako ich predchodcovia, printové média. Dokážu sprostredkovať udalosti z celého sveta na minútovej báze. S narastajúcim objemom dát, je za účelom získania vedomostí potrebné efektívne zozbieranie a spracovanie dát. Niekedy to bola úloha knižníc, dnes na to čisto ľudská sila nestačí. Držať krok s digitálnou dobou dokážeme iba ak ju využijeme v náš prospech. Práve program nazývaný web crawler zohráva kľúčovú úlohu pri zbieraní dát zo spravodajských webov. 
 
-Motiváciou práce je príprava dát zo slovenských spravodajských webov na následnú analýzu. Existuje viacero crawlerov, nastaviteľných na získavanie dát pre tieto cieľové účely. Sú ale príliš robustné a vyžadujú si zbytočne veľa zdrojov na prevádzku. 
+Web crawler umožňuje automatizované zbieranie a organizovanie dát zo širokého spektra zdrojov. Minimalizuje potrebu manuálnej práce, čím ušetrí čas a náklady. Spravodajské weby väčšinou neposkytujú zoznam všetkých ich článkov, tie sú rozptýlené a navzájom po-prepájané odkazmi. Crawler umožňuje automatizovane prejsť túto štruktúru a získať o nej informácie. Teda takto vieme zaznamenať aj vzťahy medzi článkami, nie len ich samotný obsah. 
 
-Prínosom tejto práce je navrhnutie vlastného riešenia crawlera s modulárnou architektúrou, nízkymi nárokmi na dlhodobú prevádzku a jednoduchým pridávaním zdrojových stránok. Je schopný zotaviť sa po páde a pokračovať kde prestal. Toto riešenie je možné použiť aj pre distribuované crawlovanie, avšak každý výpočtový uzol musí skúmať unikátnu množinu domén. 
+Zbieranie takýchto dát otvára možnosť hĺbkovým analýzam. Z extrahovaných informácii vieme analýzou identifikovať vzorce, trendy a korelácie v spravodajstve. To nám poskytne hodnotný náhľad do mediálneho priestoru. Napríklad hodnotenie vplyvu konkrétnych udalostí, odhaľovanie predsudkov, sledovanie šírenia dezinformácií alebo pochopenie nálad verejnosti voči určitým témam. 
 
-Tento návrh sme implementovali a úspešne pripravili dáta do vhodnej podoby na analýzu v nástroji Apache Spark. 
+Existuje množstvo dostupných crawlerov. Poväčšine sú ale na účely získania vedomostí z priestoru slovenského spravodajstva príliš robustné a komplexné. Majú vlastnosti, ktoré nepotrebujeme a vyžadujú si priveľké zdroje na prevádzku. Alebo sú jednoduché ale zato málo prispôsobiteľné pre naše potreby. 
+
+Cieľom práce je navrhnutie a implementovanie čo najmenej komplexného crawlera, zbierajúceho dáta zo slovenských spravodajských webov. Musí byť nenáročný na prevádzku a pritom byť nastaviteľný podľa potrieb analýzy. Ako zmena schémy výstupných dát, pridávanie a odoberanie zdrojov. Vlastná implementácia nám dáva možnosť prispôsobiť ho presne pre naše potreby.
+
+
+% Základom každej analýzy sú kvalitné dáta. Jedným zo zdrojov takýchto dát sú web stránky, kde sú však rozptýlene a uložené v nevhodnej podobe. Tento problém rieši webový crawler.
+
+% Motiváciou práce je príprava dát zo slovenských spravodajských webov na následnú analýzu. Existuje viacero crawlerov, nastaviteľných na získavanie dát pre tieto cieľové účely. Sú ale príliš robustné a vyžadujú si zbytočne veľa zdrojov na prevádzku. 
+
+% Prínosom tejto práce je navrhnutie vlastného riešenia crawlera s modulárnou architektúrou, nízkymi nárokmi na dlhodobú prevádzku a jednoduchým pridávaním zdrojových stránok. Je schopný zotaviť sa po páde a pokračovať kde prestal. Toto riešenie je možné použiť aj pre distribuované crawlovanie, avšak každý výpočtový uzol musí skúmať unikátnu množinu domén. 
+
+% Tento návrh sme implementovali a úspešne pripravili dáta do vhodnej podoby na analýzu v nástroji Apache Spark. 
 
 
 
@@ -34,6 +45,22 @@ Tento návrh sme implementovali a úspešne pripravili dáta do vhodnej podoby n
 % a implementovanie web crawlera prispôsobeného na zbieranie informácii so spravodajských webov.  
 % The main contribution of the thesis is the design and implementation of a custom web crawler that is tailored to the needs of news websites. The crawler is designed to be highly configurable and customizable, allowing it to adapt to the specific requirements of different news sources. It is also designed to be efficient and scalable, enabling it to handle large volumes of data without impacting the performance of the target websites.
 
-\section*{Formulácia úlohy}
+\chapter*{Formulácia úlohy}
 
 % Text záverečnej práce musí obsahovať sekciu s~formuláciou úlohy resp. úloh riešených v~rámci záverečnej práce. V~tejto časti autor rozvedie spôsob, akým budú riešené úlohy a~tézy formulované v~zadaní práce. Taktiež uvedie prehľad podmienok riešenia.
+
+Cieľom práce je návrh a implementácia crawlera špecializovaného na zber dát zo slovenských spravodajských webov. Hlavná podmienka je, že dáta sú vhodné na spracovanie nástrojom Apache Spark a dá sa nad nimi urobiť rozumná analýza. Riešenie má byť čo najmenej komplexné, a má spĺňať iba zadané požiadavky. Teda nemá mať zbytočné funkcionality, čím by sa zhoršila udržiavateľnosť systému. Závislosť na externých systémoch je dovolená iba v nevyhnutnom prípade. Hlavné požiadavky na systém sú: 
+
+\begin{itemize}
+    \item Získavanie dát vhodných na analýzu zo spravodajských webov. Konkrétne: titulok, úvodný paragraf, hlavná časť článku, mená autorov, deň vydania, deň poslednej modifikácie.
+    \item Paralelizmus - riešenie musí prechádzať stránky paralelne, ale zároveň nesmie zahlcovať web servery.
+    \item Odolnosť voči pádom - ak sa vyskytne chyba, nesmie crawler stratiť dáta.
+    \item Redukovanie cieľovej domény - crawler umožnuje nastavovanie filtrovanie stránok na prejdenie.
+    \item Pridávanie zdrojov - riešenie musí byť navrhnuté tak aby umožnilo jednoduché pridávanie nových domén na extrakciu. 
+    \item Nízka komplexita, jednoduché nasadenie a údržba. 
+\end{itemize}
+
+
+Crawler musí byť schopný pár hodinovej až pár dňovej prevádzky. Teda pri vyhodnotení splnenia cieľov práce musíme preskúmať, či crawler nestráca výkon. Crawler teda musí priebežne zbierať štatistiky o trvaní hlavných operácii. Na ich základe určíme trend a závažnosť prípadnej degradácie. 
+
+Súčasťou práce bude aj demonštratívne použitie zozbieraných dát pre jednoduchú analýzu v nástroji Apache Spark. Tým overíme, že riešenie zbiera dáta ako sme sformulovali v úlohe.

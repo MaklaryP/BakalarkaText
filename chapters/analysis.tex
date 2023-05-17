@@ -77,14 +77,14 @@
 \chapter{Analýza}
 \section{Analýza všeobecného Web Crawlera}
 
-Web Crawler, tiež nazývaný ako Spider, je webový bot, ktorý na základe jedného alebo viacerých východiskových URL adries stiahne webové stránky s nimi spojené. Extrahuje hyperlinky obsiahnuté na týchto stránkach a následne pokračuje rekurzívne v sťahovaní webových stránok identifikovanými týmito hyperlinkami. Okrem toho tiež zaznamenáva štruktúru prepojení medzi stránkami. \cite{introToInfRetrieval}
+Web Crawler, tiež nazývaný ako Spider, je webový bot, ktorý na základe jedného alebo viacerých východiskových \acrshort{url} adries stiahne webové stránky s nimi spojené. Extrahuje hyperlinky obsiahnuté na týchto stránkach a následne pokračuje rekurzívne v sťahovaní webových stránok identifikovanými týmito hyperlinkami. Okrem toho tiež zaznamenáva štruktúru prepojení medzi stránkami. \cite{introToInfRetrieval}
 
-Ich implementácia predstavuje významné inžinierske výzvy v dôsledku rozsahu internetu. Na to, aby prešli podstatnú časť "povrchového webu" v primeranej dobe, musia Web Crawleri sťahovať tisíce stránok za sekundu a zvyčajne sú distribuované na desiatky alebo stovky počítačov. Ich dve hlavné dátové štruktúry - fronta sada URL adries, ktoré ešte neboli prehliadané, a sada objavených URL adries - zvyčajne nevojdú do hlavnej pamäte, takže je potrebné používať efektívne reprezentácie na disku. \cite{encykOfDatabases}
+Ich implementácia predstavuje významné inžinierske výzvy v dôsledku rozsahu internetu. Na to, aby prešli podstatnú časť "povrchového webu" v primeranej dobe, musia Web Crawleri sťahovať tisíce stránok za sekundu a zvyčajne sú distribuované na desiatky alebo stovky počítačov. Ich dve hlavné dátové štruktúry - fronta sada \acrshort{url}  adries, ktoré ešte neboli prehliadané, a sada objavených \acrshort{url}  adries - zvyčajne nevojdú do hlavnej pamäte, takže je potrebné používať efektívne reprezentácie na disku. \cite{encykOfDatabases}
 
 \subsection{Základný algoritmus crawlovania}\label{sub:zakladnyAlgoritmusCrawlovania}
-Najjednoduchší algoritmus je sekvenčný, slúži ako základ pre zložitejšie algoritmy využívajúce paralelizmus. 
+Najjednoduchší algoritmus je sekvenčný, slúži ako základ pre zložitejšie algoritmy využívajúce paralelizmus. Diagram opisovaného algoritmu je na obrázku \ref{o:basic_crawl_algorithm}.
 
-Algoritmus začína pridaním štartovacích URL adries do fronty. Po jednej sťahuje webové stránky priradené k týmto adresám. Extrahuje z nich URL adresy. Tie pridáva do fronty a stiahnuté stránky ukladá do repozitára.
+Algoritmus začína pridaním štartovacích \acrshort{url}  adries do fronty. Po jednej sťahuje webové stránky priradené k týmto adresám. Extrahuje z nich \acrshort{url}  adresy. Tie pridáva do fronty a stiahnuté stránky ukladá do repozitára.
 
 Tento proces končí vyprázdnením fronty. To v praxi nemusí nastať pretože typické použitia web crawlera si vyžadujú neustále obnovovanie extrahovaných informácii.
 
@@ -94,14 +94,14 @@ Tento proces končí vyprázdnením fronty. To v praxi nemusí nastať pretože 
     \caption{Diagram naivného algoritmu \label{o:basic_crawl_algorithm} \cite{dataMining}}
 \end{figure}
 
-\subsection{Fronta} \todo{Premenovat nadpis}
+\subsection{Fronta}
 Fronta je centrálny prvok crawlera. Jej implementácia a nastavovanie odráža hlavné vlastnosti systému. 
 
-Naivná implementácia požaduje FIFO dátovú štuktúru s deduplikovaním. Napríklad uchovanie navštívených adries. Pre malé, napríklad POC riešenia je to dostačujúce. 
+Naivná implementácia požaduje \acrshort{fifo} dátovú štuktúru s deduplikovaním. Napríklad uchovanie navštívených adries. Pre malé, napríklad \acrshort{poc} riešenia je to dostačujúce. 
 Všeobecný crawler určený na široký web je typicky distribuovaný a potrebuje stránky znovu navštevovať pre zaručenie aktuálnosti zozbieraných informácii. Taktiež nemá dostatočné zdroje na pokrytie celej domény a musí selektovať adresy na navštívenie. Preto nepostačuje naivné riešenie, a fronta pre praktické využitie musí riešiť tieto požiadavky. 
 
 \subsection{Extractor}
-Extraktor je dôležitou súčasťou crawlera, ktorého zodpovednosťou je získavanie URL adries a relevantných údajov zo statických, dynamických webových stránok ale aj obsahu dostupného až po interakcii s vyrenderovanou stránkou (napríkad kliknutie na tlačidlo alebo odoslanie formulára). Teda nemusí ísť len o obyčajný HTML parser. 
+Extraktor je dôležitou súčasťou crawlera, ktorého zodpovednosťou je získavanie \acrshort{url} adries a relevantných údajov zo statických, dynamických webových stránok ale aj obsahu dostupného až po interakcii s vyrenderovanou stránkou (napríkad kliknutie na tlačidlo alebo odoslanie formulára). Teda nemusí ísť len o obyčajný \acrshort{html} parser. 
 
 Jedna z pozorovaných vlastností extraktora je úspešnosť extrakcie, teda koľko relevantných dát sa podarilo extrahovať z jednej stránky. Môžeme sledovať priemerné úspešnosť naprieč celou prehľadávanou doménou.  
 
@@ -120,7 +120,7 @@ Po čakaní na odpoveď z web servera ide o druhú časovo najnáročnejšiu ča
 
 \textbf{Politika paralelizácie} (Parallelization policy) - určuje, ako crawler rozdeľuje prácu a koordinuje súbežné prehľadávanie stránok. 
 
-Politiky môžu byť statické - nastavenie pre jednotlivé stránky alebo skupiny stránok na základe ich domény. Napríklad zoznam stránok, ktorým dôverujeme a sú pre nás najpodstatnejšie. \todo{dobry nazov - napriklad index.sme.sk sme je domena}
+Politiky môžu byť statické - nastavenie pre jednotlivé stránky alebo skupiny stránok na základe ich domény. Napríklad zoznam stránok, ktorým dôverujeme a sú pre nás najpodstatnejšie.
 Alebo dynamické - meniace sa podľa informácii získaných prehľadávaním. Napríklad analýzou obsahu stránky určíme relevantnosť stránok v tej istej doméne. 
 
 
@@ -149,14 +149,14 @@ Crawlery môžeme na základe ich použitia a funkčnosti rozdeliť do základn�
 \subsection{Univerzálny alebo horizontálny crawler}
 Najbežnejší typ, používaný v indexovaní širokého webu. Jeho cieľom je navštívenie čo najviac domén.
 
-Základná stratégia spočíva v uprednostňovaní adries z domén, ktoré ešte navštívil alebo ich navštívil dávno. To má za následok plytké prejdenie jednej domény. 
+Základná stratégia spočíva v uprednostňovaní adries z domén, ktoré ešte nenavštívil alebo ich navštívil dávno. To má za následok plytké prejdenie jednej domény. 
 
-Internet obsahuje bilióny stránok a rastie exponenciálne. Prejdenie významnej časti webu touto stratégiou si vyžaduje veľké množstvo zdrojov a masívne distribuovaný systém. 
+Internet obsahuje bilióny stránok a rastie exponenciálne. Prejdenie významnej časti webu touto stratégiou si vyžaduje veľké množstvo zdrojov a masívne distribuovaný a škálovateľný systém. 
 
 Typickým príkladom na tento druh sú crawlery na vybudovanie indexu pre internetové vyhľadávače.
 
 \subsection{Vertikálny crawler}
-Vertikálny crawler taktiež nazývaný fokusovaný crawler, je typ crawlera zameriavajúci sa na vybranú množinu stránok alebo skupinu stránok súvisiacich so skúmanou témou.
+Vertikálny crawler taktiež nazývaný cielený (focused) crawler, je typ crawlera zameriavajúci sa na vybranú množinu stránok alebo skupinu stránok súvisiacich so skúmanou témou.
 
 Oproti horizontálnemu, používa stratégiu prehľadávania do hĺbky. Teda rovno navštevuje objavené adresy bez snahy najprv vybudovať šírku korpusu. 
 
@@ -165,7 +165,7 @@ Vyžaduje si oveľa menej prostriedkov ako horizontálny, keďže nepotrebuje pr
 Podmnožina môže byť určená staticky, teda táto podmnožina sa crawlovaním nemení. Jedna z možných implementácii dynamického vertikálneho prehľadávania je určenie relevantých stránok na základe ich obsahu. Napríklad výskyt kľúčových slov, alebo odkazy na iné relevantné stránky. Ak je stránka označená za relevantnú tak crawler navštívi aj stránky odkazované touto stránkou. 
 
 \subsection{Škodlivé crawlery}
-Crawlery sa dajú použiť aj nelegálne účely. Môže ísť napríklad o hľadanie chýb v bezpečnosti web stránok, zahlcovanie nežiadúcim obsahom, kradnutím obsahu a na útoky hrubou silou. Typicky sú vysoko špecializované a teda aj vertikálne. 
+Crawlery sa dajú použiť aj na nelegálne účely. Môže ísť napríklad o hľadanie slabín v zabezpečení web stránok, zahlcovanie nežiadúcim obsahom, kradnutím obsahu a na útoky hrubou silou. Typicky sú vysoko špecializované a teda aj vertikálne. 
 
 
 \subsection{Sémantické crawlery}
@@ -194,7 +194,7 @@ Crawler je vhodným nástrojom na získavanie dát pre výskumné účely. Pomoc
 \textbf{Umelá inteligencia} potrebuje byť natrénovaná na obrovských datasetoch. Práve na ich prípravu sa môže použiť crawler. Napríklad zozbieranie otázok a odpovedí zo stránky Stack Overflow, za účelom vytrénovania AI chat bota. \cite{stackOverflowCrawl}
 
 \subsection{Použitie v oblasti spravodajských webov}
-Typickým príkladom sú \textbf{portály zdieľajúce články} z rôznych spravodajských webov. Napríklad služba Google news\footnote{https://news.google.com/}. Táto a jej podobné služby prehľadávajú spravodajské weby a odporúčajú články používateľovi na základe jeho čitateľskej histórie a tém záujmu. Ak článok nie je kategorizovaný, využíva sa NLP (Natural language processing) na extrahovanie tém článkov (topic extraction/classification). Takto sa vedia obohatiť články o ďalšie informácie nevyskytujúce sa priamo na pozorovanej stránke.
+Typickým príkladom sú \textbf{portály zdieľajúce články} z rôznych spravodajských webov. Napríklad služba Google news\footnote{https://news.google.com/}. Táto a jej podobné služby prehľadávajú spravodajské weby a odporúčajú články používateľovi na základe jeho čitateľskej histórie a tém záujmu. Ak článok nie je kategorizovaný, využíva sa \acrshort{nlp} (Natural language processing) na extrahovanie tém článkov (topic extraction/classification). Takto sa vedia obohatiť články o ďalšie informácie nevyskytujúce sa priamo na pozorovanej stránke.
 
 \textbf{Agregácia správ v reálnom čase}, pri ktorej je potrebné za čo najkratší čas zozbierať a užívateľovi zobraziť informácie z vybranej skupiny stránok. Napríklad prehľad športových výsledkov. 
 
@@ -202,11 +202,11 @@ Crawlovanie sa taktiež používa pri \textbf{identifikácii nekvalitných člá
 
 
 
-\section{Porovnanie existujúcich riešení} \todo{asi premenovat}
-Na trhu je mnoho crawlerov, pohybujúcich sa od SaaS riešení až po nízko úrovňové knižnice. Nie je možné v tejto práci porovnať všetky z nich. Vybrali sme tri open-source projekty ako zástupcov, s rôznymi prístupmi, zameraniami a zložitosťou použitia.
+\section{Porovnanie existujúcich riešení}
+Na trhu je mnoho crawlerov, pohybujúcich sa od \acrshort{saas} riešení až po nízko úrovňové knižnice. Nie je možné v tejto práci porovnať všetky z nich. Vybrali sme ako zástupcov tri voľne šíriteľné projekty s otvoreným softvérovým kódom, s rôznymi prístupmi, zameraniami a zložitosťou použitia.
 
 \subsection{News-please}
-News-please\footnote{https://github.com/fhamborg/news-please} je open-source crawler zameraný na extrahovanie názvu článku, úvodného paragrafu, hlavného textu, hlavného obrázka, mien autorov, dňa vydania a jazyka článku. Je spustiteľný po malých modifikáciách hneď po inštalácii, nevyžaduje si zasahovanie do kódu. Ovláda sa cez CLI, čo ho robí oproti iným open-source riešeniam vhodným nástrojom pre vedcov a analytikov s obmedzenými alebo žiadnymi programátorskými schopnosťami. Je postavený na Scrapy frameworku. 
+News-please\footnote{https://github.com/fhamborg/news-please} je crawler zameraný na extrahovanie názvu článku, úvodného paragrafu, hlavného textu, hlavného obrázka, mien autorov, dňa vydania a jazyka článku. Je spustiteľný po malých modifikáciách hneď po inštalácii, nevyžaduje si zasahovanie do kódu. Ovláda sa cez \acrshort{cli}, čo ho robí oproti iným voľne šíriteľným riešeniam s otvoreným kódom vhodným nástrojom pre vedcov a analytikov s obmedzenými alebo žiadnymi programátorskými schopnosťami. Je postavený na Scrapy frameworku. 
 
 Extrahovanie dát z článkov prebieha bez potreby modifikácie, či už kódu, alebo cez CLI. To neplatí pre iné riešenia, tie si vyžadujú implementovanie extraktora alebo jeho nastavenie. Použitý extraktor v crawlery news-please dosahuje úspešnosť 60\% až 80\% \cite{newsPlease}. Čo je dostačujúce pre zbieranie dát zo širokého korpusu spravodajských webov. Napríklad pre analýzu sentimentu v spravodajstve. To ale nemusí dostačovať pre zbieranie dát z úzkeho korpusu, teda z malého počtu domén. 
 
@@ -215,13 +215,13 @@ News-please neposkytuje pohodlné a praktické nastavenia extraktora. Taktiež n
 Nepodporuje poriadnu distribúciu a horizontálnu škálovateľnosť. Ak budeme nedostatočným výkonom nútení použiť viac výpočetných jednotiek, môžeme rozdeliť prehľadávané stránky podľa doménového mena. Teda každá výpočetná jednotka dostane skupinu doménových mien na prehľadanie. Takéto riešenie nie je ale dostatočne robustné pre všetky aplikácie. 
 
 \subsection{Scrapy} 
-Scrapy je Python open-source framework, určený na implementovanie web crawlerow. Oproti News-please ide len o framework pomocou, ktorého sa dá vytvoriť crawler. Nejde teda o samostatnú aplikáciu. 
+Scrapy je Python voľne šíriteľný framework, určený na implementovanie web crawlerow. Oproti News-please ide len o framework pomocou, ktorého sa dá vytvoriť crawler. Nejde teda o samostatnú aplikáciu. 
 
-Jeho API je relatívny vysoko abstraktné, teda používateľ nie je nútený riešiť implementačné detaily. Tvorca crawlera implementuje logiku crawlovania, hlavne extraktor a ukladanie získaných dát.
+Jeho \acrshort{api} je relatívny vysoko abstraktné, teda používateľ nie je nútený riešiť implementačné detaily. Tvorca crawlera implementuje logiku crawlovania, hlavne extraktor a ukladanie získaných dát.
 
 Je vysoko flexibilný, čo ho robí ale aj náročnejším na použitie. To je vyvážene zdravou a veľkou komunitou. Taktiež aj kvalitnou dokumentáciou. 
 
-Medzi hlavné nevýhody patrí absencia podpory spustenia v distribuovanom systéme. Dá sa to obísť rovnakou mechanikou ako je popísaná pre news-please. Odporúča ju aj oficiálna dokumentácia\footnote{https://docs.scrapy.org/en/latest/topics/practices.html}. Rozdelenie stránok, distribúcia a škálovanie je už na na tvorcovi crawlera. 
+Medzi hlavné nevýhody patrí absencia podpory spustenia v distribuovanom systéme. Dá sa to obísť rovnakou mechanikou ako je popísaná pre news-please. Odporúča ju aj oficiálna dokumentácia\footnote{https://docs.scrapy.org/en/latest/topics/practices.html}. Rozdelenie stránok, distribúcia a škálovanie je už na tvorcovi crawlera. 
 
 \subsection{Apache Nutch}
 Apache Nutch je vďaka pluginovej architektúre vysoko rozšíriteľný crawler. Podporuje distribúciu a horizontálnu škálovateľnosť, to ho robí vhodným nástrojom pre vybudovanie vysoko výkonných crawlovacích botov. Schopnosť pridávať a nahradzovať pluginy a rozšírenia umožňuje programátorom modifikovať takmer celé správanie. Môže ísť napríklad o pridanie nového dátového zdroja, zmenu extraktora alebo aj o zmenu logiky paralelizácie. 
