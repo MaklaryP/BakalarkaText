@@ -99,3 +99,25 @@ classDiagram
     
 
 ===========================================================================================
+
+flowchart TD
+    S(Štart)
+    S -->|Nastaviť| A[Logger] 
+    S -->|Inicializovať| B[UrlManager]
+    S -->|Pripraviť| G[Adresy na prejdenie]
+    S -->|Inicializovať| E[Repozitár]
+    S --> L[Limit]
+
+    B --> C{Pokračovať v predošlom behu}
+    C -->|Áno| D[urlManager.loadFromFile] 
+    
+    E -->|Vložiť do| F[CrawlerContext]
+    A -->|Vložiť do| F
+    D -->|Vložiť do| F
+    C -->|Nie| F
+
+    F --> I[Init Crawler]
+    G --> I
+    L --> I
+    
+
