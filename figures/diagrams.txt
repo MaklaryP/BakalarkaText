@@ -121,3 +121,79 @@ flowchart TD
     L --> I
     
 
+================================= Urlmanager class diagram
+classDiagram
+    UrlManager <|.. InMemoryUm : implementuje
+    UrlManager <|.. PersistedInMemoryUM : implementuje
+    InMemoryUm --* PersistedInMemoryUM: obsahuje
+
+class UrlManager{
+    <<interface>>
+    upsert(toUpsert: Seq[Url]): Unit
+    getBatch(batchSize: Int): Seq[Url]
+    markAsCrawled(crawled: Seq[UrlVisitRecord]): Unit
+    sizeToCrawl(): Long
+    sizeOfCrawled(): Long
+}
+
+class InMemoryUm{
+    queue: Seq[Url]
+    crawled: Set[Url]
+}
+
+class PersistedInMemoryUM{
+    saveToFile(): Unit
+    def loadFromFile(): Unit
+}
+
+========================================= Class diagram Repository
+classDiagram
+    Repository <|.. OneCsvRepo : implementuje
+    Repository <|.. InMemoryRepo: implementuje
+    Repository <|.. FolderCsvRepo : implementuje
+
+class Repository{
+    <<interface>>
+    saveStep(stepResults: Seq[RepoDTO])
+}
+
+class OneCsvRepo{
+   targetPath: Path
+}
+
+class FolderCsvRepo{
+    targetPath: Path
+}
+
+class InMemoryRepo{
+    mutableResult: mutable.Buffer[RepoDTO]
+    getAllSaved(): Seq[RepoDTO]
+}
+
+=============================== DomainScraper
+
+classDiagram
+    DomainScraper <|.. SmeDomain : implementuje
+    SupportedDomains "*" o-- "1" DomainScraper: obsahuje
+    DomainFilter <-- SupportedDomains: používa
+
+
+class DomainScraper{
+    <<interface>>
+    parseDocument(doc: Document): PageContent
+    isUrlInDomain(url: Url): Boolean
+}
+
+
+class SupportedDomains{
+    <<singleton>>
+    supportedDomains: Seq[DomainScraper]
+    apply(): Seq[DomainScraper]
+}
+
+class DomainFilter{
+    <<singleton>>
+    isUrlInSupportedDomains(url: Url): Boolean
+    filterSupportedUrls(urls: Seq[Url]): Seq[Url]
+    getDomainScraper(url: Url): Option[DomainScraper]
+}
