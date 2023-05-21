@@ -197,3 +197,26 @@ class DomainFilter{
     filterSupportedUrls(urls: Seq[Url]): Seq[Url]
     getDomainScraper(url: Url): Option[DomainScraper]
 }
+
+
+============================================ Basic crawl mine
+
+flowchart TD
+    A([Štart]) --> B[Inicializovanie Fronty]
+    B --> C[Získanie adresy z fronty]
+    C --> D[Načítanie HTML stránky]
+    D --> E[Extrahovanie adries na stránke a pridanie do fronty]
+    E --> F[Uloženie HTML stránky]
+    F -.-> DB[(Repozitár)]
+
+    B -.-> Fronta(Fronta)
+    Seeds[/Štartovacie adresy/] -.-> B
+    Fronta -.-> C
+    E -.-> Fronta
+
+    Web[/Web/] --> D
+    D --> Web
+    
+    F --> G{Fronta je prázdna}
+    G -->|Nie| C
+    G -->|Áno| STOP([Stop])

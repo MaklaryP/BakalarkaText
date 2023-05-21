@@ -1,4 +1,4 @@
-\chapter{Implementácia}
+\chapter{Implementácia crawlera na základe návrhu}
 \label{implementation}
 V tejto kapitole podrobne popíšeme implementáciu podla návrhu v predchádzajúcej kapitole. Riešenie sme sa snažili spraviť dostatočne robustne na jednoduché rozširovanie v miestach pravdepodobných na zmenu správania v budúcnosti. Ale zároveň udržať nízku komplexitu a nevytvárať zbytočné vrstvy abstrakcie. Taktiež dodržiavať zaužívané princípy ako napríklad SOLID. 
 Používali sme OOP ale aj funkcionálnu paradigmu a postupovali sme iteratívne. 
@@ -149,13 +149,14 @@ Dôležitou súčasťou nastavení je aj podmienka ukončenia crawlovanie. Na ob
 \end{figure}
 
 \section{Výzvy ktorým sme čelili pri implementácii riešenia}
+Pri implementácii sme čelili dvom väčším problémom. V tejto podkapitole si ich rozoberieme.
 
 \subsection{Nevhodný návrh tried reprezentujúcich výsledok.}
 Prvá implementácia využívala polymorfizmus pre rozdielne správanie tried Crawled a Failed. Napríklad pri zápise do repozitára, alebo pri agregovaní štatistík. 
 
 To ale spravilo tieto triedy zodpovednými za veľkú časť funkcionality crawlera. Čo je výrazné porušenie prvého zo zaužívaných SOLID princípov. Princíp jednej zodpovednosti (Single responsibility principle) hovorí, že každý modul by mal mať iba jeden dôvod na zmenu. V našom prípade by sa tieto triedy museli meniť so zmenou v agregovaní štatistík, zmenou v logike výberu adries na prechádzanie v jednom kroku, zmenou vo formáte alebo spôsobe ukladanie výsledkov. Teda takmer pri každej zmene na ktorú bola aplikácia navrhnutá. Čo je samozrejme veľmi nevhodný dizajn vedúci k zhoršenej udržiavateľnosti, testovateľnosti a spomaleniu rýchlosti vývoja.  
 
-Preto sme sa rozhodli prerobiť aplikáciu a využiť kompozíciu na miesto dedičnosti. Čo nám umožnilo lepšie oddelenie zodpovedností. Z týchto tried sa stali iba jednoduché nosiče informácii bez logiky. Tá sa presunula do príslušných modulov.
+Preto sme sa rozhodli prerobiť aplikáciu a dedičnosti nahradiť kompozíciou. Čo nám umožnilo lepšie oddelenie zodpovedností. Z týchto tried sa stali iba jednoduché nosiče informácii bez logiky. Tá sa presunula do príslušných modulov.
 
 \subsection{Vyčerpanie pamäte}
 Pri návrhu sme predpokladali, že zozbieraná dáta sú väčšie ako dostupná operačná pamäť. Preto agregujeme a ukladáme výsledky pracovných vlákien pravidelne. 
@@ -164,4 +165,4 @@ Prvá verzia, slúžiaca len na demonštráciu funkčnosti návrhu, agregovala a
 
 Pri vytváraní finálnej implementácie sme to neodstránili a pri nasadení nám to po necelej hodine padlo. Z výpisu chyby vyplývalo, že pamäť sa minula pri zápise do modulu manažujúceho adresy (UrlManager). V spojení s obavami opísaných pri návrhu sme vyčerpanie pamäte pripisovali práve tomuto modulu. Až analýza použitia pamäte nás nasmerovala k zabudnutému kódu. 
 
-Ten sme nahradili priebežným počítaním štatistík. 
+Ten sme nahradili priebežným počítaním štatistík. A riešenie vie vďaka tomu bežať desiatky hodín bez problémov.

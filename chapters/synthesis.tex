@@ -1,7 +1,10 @@
 % !TEX root = ../thesis.tex
 
-\chapter{Návrh riešenia}
+\chapter{Určenie požiadaviek a navrhnutie riešenia}
 \label{methodology}
+
+V tejto kapitole navrhneme web crawler podľa zadanej úlohy. Najprv sa pozrieme na kontext, v ktorom crawler bude nasadený. To nám umožní lepšie zadefinovanie požiadaviek na výsledný systém. Následne vyberieme technológie a navrhneme architektúru. 
+
 
 \section{Kontext využitia}
 
@@ -17,7 +20,7 @@ Tieto frameworky podporujú jazyky Java, Scala, Python a R. Scalu považujeme za
 
 Pre tento ETL proces uloženie dát v relačnej ani inej databáze neprináša žiadne benefity oproti uloženiu v jednom alebo viacerých klasických súboroch ako CSV, Parquet a podobne. 
 
-Predpokladané zameranie analýzy bude sledovanie trendov, sentiment spoločnosti, klasifikácia do tém alebo identifikovanie najrelevantnejších článkov, napríklad pomocou backlink analýzy. 
+Predpokladané zameranie analýzy bude sledovanie trendov, sentiment spoločnosti, klasifikácia do tém alebo identifikovanie najrelevantnejších článkov, napríklad pomocou analýzy spätných odkazov. 
 
 V čase navrhovania crawlera, nám nie je detailne známe aké dáta si bude vyžadovať analýza. Považujeme to za miesto potencionálneho rozširovania funkcionality. 
 
@@ -31,6 +34,7 @@ Výpočtové a finančné zdroje sú taktiež minimalistické. Predpokladáme, �
 
 
 \section{Požiadavky}
+V tejto podkapitole stanovíme požiadavky na výsledný systém.
 
 \subsection{Paralelizmus}\label{c:reqParalel}
 Čakanie na odpoveď servera je hlavné výkonnostné obmedzenie. Preto požadujeme aby systém spracovával stránky paralelne. Týmto výrazne zvýšime efektívnosť a výkonnosť crawlera. Avšak musíme sa vyhnúť zablokovaniu od serverov webstránok prekročením maximálneho povoleného počtu dotazov za úsek času Teda nepoužiť príliš veľkú paralelizáciu. 
@@ -48,9 +52,7 @@ Za vhodné považujeme aj logovanie s nastaviteľnou úrovňou, pre zjednodušen
 Zameriavame sa na extrahovanie dát z vybranej skupiny spravodajských webov. Túto skupinu chceme jednoducho upravovať, či už pridávať nové zdroje alebo redukovať existujúce. Táto časť riešenia by mala byť otvorená rozširovaniu. 
 
 \subsection{Nízka komplexita, jednoduché nasadenie a údržba} \label{c:reqKomplexity}
-Potrebujeme aby systém bol ľahko udržateľný a nasaditeľný. Preto požadujeme aby systém bol čo najmenej komplexný. Znížená robustnosť a menej dostupných funkcionalít nám neprekáža. Potrebujeme najjednoduchšie riešenie čo zvládne vyriešiť náš problém, s čo najmenej zdrojmi (lightweight software). 
-
-Očakávané úlohy údržby: \todo{formátovanie aby pekne sedelo}
+Potrebujeme aby systém bol ľahko udržateľný a nasaditeľný. Preto požadujeme aby systém bol čo najmenej komplexný. Znížená robustnosť a menej dostupných funkcionalít nám neprekáža. Potrebujeme najjednoduchšie riešenie čo zvládne vyriešiť náš problém, s čo najmenej zdrojmi (lightweight software). Očakávané úlohy údržby:
 \begin{itemize}
   \item Pridávanie a odoberanie cieľových domén.
   \item Oprava chýb.
@@ -87,7 +89,7 @@ Využitím JVM a jazyka Scala aj v našom riešení sa vyhneme zvyšovaniu náro
 
 Scala má vhodnú úroveň abstrakcie pre naše potreby, vysokú expresívnosť a plne podporuje funkcionálnu paradigmu. Tá vyniká v aplikáciach s vysokou paralelizáciou a dôrazom na dáta. Čo je aj naše použitie. 
 
-Pre tieto dôvody ju vyberáme ako jazyk, s ktorým vybudujeme náš crawler. Kedže považujeme za benefitné použiť ten istý jazyk pre obe časti celkového riešenia, potrebuje v našom riešení použiť rovnakú verziu ako použije analytická časť. Použitá verzia Sparku - 3.4.0, podporuje JVM verziu 8/11/17 a Scalu 2.12/2.13. Nevidíme, žiadne podstatné rozdieli medzi týmito dvoma podporovanými verziami. Použijeme 2.12. \todo{zdroj na dokumentaciu https://spark.apache.org/docs/latest/}
+Pre tieto dôvody ju vyberáme ako jazyk, s ktorým vybudujeme náš crawler. Kedže považujeme za benefitné použiť ten istý jazyk pre obe časti celkového riešenia, potrebuje v našom riešení použiť rovnakú verziu ako použije analytická časť. Použitá verzia Sparku - 3.4.0, podporuje JVM verziu 8/11/17 a Scalu 2.12/2.13. Nevidíme, žiadne podstatné rozdieli medzi týmito dvoma podporovanými verziami. Použijeme 2.12.
 
 \subsection{Výber technológie}
 
@@ -117,9 +119,7 @@ Aktuálne požiadavky na systém budú rovnako splnené aj bez použitia databá
 
 \section{Návrh architektúry}
 
-Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}\todo{Opravit cross referenciu}. Pridáva hlavne paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. Hlavné moduly crawlera sú  extraktor, orchestrátor, repozitár a URL manažér (ďalej ako UM).  Na obrázku \ref{o:classDiagramVisitResult} sú znázornené pomocné triedy.
-
-\todo{diagram vsetkych implementacii a interfacov}
+Pri návrhu staviame na základný algoritmus crawlovania popísaný v časti: \ref{sub:zakladnyAlgoritmusCrawlovania}. Pridáva hlavne paralelizáciu a schopnosť vrátiť sa do stavu pred pádom programu. Hlavné moduly crawlera sú  extraktor, orchestrátor, repozitár a URL manažér (ďalej ako UM).  Na obrázku \ref{o:classDiagramVisitResult} sú znázornené pomocné triedy.
 
 \subsection{Orchestrátor}
 Tento modul je zodpovedný  za paralelizáciu a integrovanie ďalších modulov. Stránky prechádza po krokoch, tie môžeme v zmysle požiadaviek nazvať checkpointy. Od UM dostane časť práce na jeden krok, teda kolekciu URL adries. Túto časť rozdelí pracujúcim vetvám (threads) na časti (chunky) a čaká kým dokončia svoju prácu. 
@@ -137,13 +137,9 @@ Keďže najprv zapisujeme do repozitára a až potom do fronty zodpovednej za ob
 
 
 \subsection{URL Manažér}
-Jeho zodpovednosť je poskytnúť URL adresy na navštívenie a to bez opakovania. Taktiež byť odolný voči pádom a reštartom ako je požadované v ref{sec:reqFailRecovery}.
+Jeho zodpovednosť je poskytnúť URL adresy na navštívenie a to bez opakovania. Taktiež byť odolný voči pádom a reštartom ako je požadované v \ref{sec:reqFailRecovery}.
 
 Jeho obsah môže byť väčší ako operačná pamäť a v spojení s požiadavkou \ref{sec:reqFailRecovery} musíme jeho stav ukladať v externom úložisku. Môže ísť o malú súborovú databázu alebo obyčajný súbor. Pre potreby testovania a rýchleho vývoja navrhujeme implementovať aj UM nezávislé na externom úložisku. To ale bude podrobne riešiť v implementačnej časti. 
-
-
-\todo{Navrhnutie aký externý systém použijeme}
-
 
 \subsection{Repozitár}
 Tento modul je zodpovedný za uloženie extrahovaných dát pre následnú analýzu. 
@@ -159,20 +155,18 @@ Keby sme zapisovali do jedného súboru riskujeme prekročenie limitu veľkosti 
 Každý krok preto zapíšeme do samostatného súboru, ako názov môžeme použiť napríklad časovú značku. Veľkosť súboru bude kontrolovaná veľkosťou kroku, teda počtom v ňom spracovaných adries. ETL proces bude spracovávať iba nové súbory. To dosiahne logovaním názvov spracovaných súborov alebo ich mazaním. 
 
 \subsection{Extraktor}
-Extraktor je zodpovedný za extrakciu releventných dát z navštívenej stránky ako aj extrahovanie URL adries. Extrahuje iba cieľové adresy, teda v ňom prebieha filtrovanie aké domény chceme navštíviť\todo{tu sa hodi aby sme v analyze zaviedli pojem focused crawler a cielove domeny alebo nieco podobne}. 
+Extraktor je zodpovedný za extrakciu releventných dát z navštívenej stránky ako aj extrahovanie URL adries. Extrahuje iba cieľové adresy, teda v ňom prebieha filtrovanie aké domény chceme navštíviť. 
 
 Podpora extrakcie stránky je prevedená implementáciou tohto interfacu. Napríklad extrakcia sme.sk bude prevedená v SmeExtraktor.
-
-\todo{dopisanie sposoby filtorovania adreies a ako priraduje adrese extraktor + diagram}
 
 \subsection{Prístup k paralelizácii}
 Môže sa naskytnúť otázka, prečo si pracujúce vlákna nepýtajú adresy priamo od UM a svoju prácu nezapisujú do repozitára, ale robia to prostredníctvom orchestrátora? V nasledujúcich odstavoch si vysvetlíme prečo sme sa tak rozhodli a aké princípy nás k tomu viedli. 
 
 Hľadanie chýb je v paralelných systémoch notoricky náročnejšie. Časť problému riešia základné princípy funkcionálneho programovania a to nemenné dátové štruktúry (immutables) a uprednostňovanie čistých funkcií (pure functions). 
 
-Používanie nemenných štruktúr nám umožní zdieľanie zdrojov medzi vláknami bez potreby synchronizácie a uzamykania. To eliminuje riziko race condition\todo{prelozit}.
+Používanie nemenných štruktúr nám umožní zdieľanie zdrojov medzi vláknami bez potreby synchronizácie a uzamykania. To eliminuje riziko súťažnej situácie (race condition).
 
-Čisté funkcie si vieme zjednodušene a nie úplne korektne definovať ako funkcie bez vedľajších efektov. Vedľajšími efektmi sú napríklad zápis alebo čítanie z databázy. Pre túto prácu je uvedená definícia postačujúca, nakoľko sa nezameriava na funkcionálne programovanie. \todo{Definovať lepsie mozno ked bude malo textu}. To znamená, že nepotrebujeme synchronizačné a zamykacie mechanizmy. Výrazný pridaným benefitom je jednoduché chápanie a predvídateľnosť. 
+Čisté funkcie si vieme zjednodušene a nie úplne korektne definovať ako funkcie bez vedľajších efektov. Vedľajšími efektmi sú napríklad zápis alebo čítanie z databázy. Pre túto prácu je uvedená definícia postačujúca, nakoľko sa nezameriava na funkcionálne programovanie. To znamená, že nepotrebujeme synchronizačné a zamykacie mechanizmy. Výrazný pridaným benefitom je jednoduché chápanie a predvídateľnosť. 
 
 Program bez vedľajších efektov ale nerobí nič užitočné, keďže nevie interagovať s prostredím. Našou snahou teda nie je úplná eliminácia ale zníženie ich počtu a ich presunutie na hranice systému. Teda snažíme sa aby jadro systému bolo zostavené z čistých funkcii a vedľajšie efekty prebiehali iba na perifériách systému, s obmedzenou komunikáciou s jadrom. Nazveme to princípom separácie.
 
@@ -203,7 +197,7 @@ else
 \end{lstlisting}
 
 
-Pre testovacie účely sa môže použiť aj neperzistovaný repozitár a UM. Ide o podobnú techniku ako mockovanie\todo{PRELOZIT???} ale dosiahnutú bez reflexie. 
+Pre testovacie účely sa môže použiť aj neperzistovaný repozitár a UM. Ide o podobnú techniku ako podsúvanie falošných objektov (mocking) ale dosiahnutú bez reflexie. 
 
 \begin{figure}[!ht]
     \centering

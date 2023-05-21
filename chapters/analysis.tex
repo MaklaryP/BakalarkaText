@@ -74,10 +74,12 @@
 
 % \blindtext
 
-\chapter{Analýza}
-\section{Analýza všeobecného Web Crawlera}
+\chapter{Analýza web crawlera}
+V tejto kapitole si popíšeme všeobecný web crawler, jeho prvky, vlastnosti a základný algoritmus. Taktiež sa pozrieme na bežné typy crawlerov a použitie crawlerov v komerčnej sfére a vo výskume. Na konci porovnáme pár existujúcich riešení.
 
-Web Crawler, tiež nazývaný ako Spider, je webový bot, ktorý na základe jedného alebo viacerých východiskových \acrshort{url} adries stiahne webové stránky s nimi spojené. Extrahuje hyperlinky obsiahnuté na týchto stránkach a následne pokračuje rekurzívne v sťahovaní webových stránok identifikovanými týmito hyperlinkami. Okrem toho tiež zaznamenáva štruktúru prepojení medzi stránkami. \cite{introToInfRetrieval}
+\section{Popis všeobecného Web Crawlera}
+
+Web Crawler, tiež nazývaný ako Spider, je webový bot, ktorý na základe jedného alebo viacerých východiskových \acrshort{url} adries stiahne webové stránky s nimi spojené. Extrahuje hyperlinky obsiahnuté na týchto stránkach a následne pokračuje rekurzívne v sťahovaní webových stránok identifikovanými týmito hyperlinkami. Okrem toho tiež zaznamenáva štruktúru prepojení medzi stránkami \cite{introToInfRetrieval}.
 
 Ich implementácia predstavuje významné inžinierske výzvy v dôsledku rozsahu internetu. Na to, aby prešli podstatnú časť "povrchového webu" v primeranej dobe, musia Web Crawleri sťahovať tisíce stránok za sekundu a zvyčajne sú distribuované na desiatky alebo stovky počítačov. Ich dve hlavné dátové štruktúry - fronta sada \acrshort{url}  adries, ktoré ešte neboli prehliadané, a sada objavených \acrshort{url}  adries - zvyčajne nevojdú do hlavnej pamäte, takže je potrebné používať efektívne reprezentácie na disku. \cite{encykOfDatabases}
 
@@ -90,7 +92,7 @@ Tento proces končí vyprázdnením fronty. To v praxi nemusí nastať pretože 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=.9\textwidth]{figures/basicCrawlAlgorithm.png}
+    \includegraphics[width=1\textwidth]{figures/basicCrawlAlgorithmMine.png}
     \caption{Diagram naivného algoritmu \label{o:basic_crawl_algorithm} \cite{dataMining}}
 \end{figure}
 
@@ -144,21 +146,21 @@ vedieť prispôsobiť.
 \textbf{Etickosť} - systém by mal rešpektovať pravidlá v robots.txt.
 
 \section{Typy web crawlerov}
-Crawlery môžeme na základe ich použitia a funkčnosti rozdeliť do základných skupín: univerzálne, vertikálne, inkrementálne, distribuované, sémantické, hĺbkové, zbierajúce dáta v reálnom čase a škodlivé. Tieto skupiny nie sú výlučné a je bežné, že crawler patrí do viacerých kategórii. Bližšie opíšeme najvýznamnejšie z nich. 
+Crawlery môžeme na základe ich použitia a funkčnosti rozdeliť do základných skupín: univerzálne, vertikálne, inkrementálne, distribuované, sémantické, hĺbkové, zbierajúce dáta v reálnom čase a škodlivé \cite{studyOfCrawlTypes}. Tieto skupiny nie sú výlučné a je bežné, že crawler patrí do viacerých kategórii. Bližšie opíšeme najvýznamnejšie z nich. 
 
 \subsection{Univerzálny alebo horizontálny crawler}
 Najbežnejší typ, používaný v indexovaní širokého webu. Jeho cieľom je navštívenie čo najviac domén.
 
 Základná stratégia spočíva v uprednostňovaní adries z domén, ktoré ešte nenavštívil alebo ich navštívil dávno. To má za následok plytké prejdenie jednej domény. 
 
-Internet obsahuje bilióny stránok a rastie exponenciálne. Prejdenie významnej časti webu touto stratégiou si vyžaduje veľké množstvo zdrojov a masívne distribuovaný a škálovateľný systém. 
+Internet obsahuje bilióny stránok a rastie exponenciálne. Prejdenie významnej časti webu touto stratégiou si vyžaduje veľké množstvo zdrojov a masívne distribuovaný a škálovateľný systém \cite{horizontalCrawl}. 
 
 Typickým príkladom na tento druh sú crawlery na vybudovanie indexu pre internetové vyhľadávače.
 
 \subsection{Vertikálny crawler}
 Vertikálny crawler taktiež nazývaný cielený (focused) crawler, je typ crawlera zameriavajúci sa na vybranú množinu stránok alebo skupinu stránok súvisiacich so skúmanou témou.
 
-Oproti horizontálnemu, používa stratégiu prehľadávania do hĺbky. Teda rovno navštevuje objavené adresy bez snahy najprv vybudovať šírku korpusu. 
+Oproti horizontálnemu, používa stratégiu prehľadávania do hĺbky. Teda rovno navštevuje objavené adresy bez snahy najprv vybudovať šírku korpusu \cite{verticalSearch}. 
 
 Vyžaduje si oveľa menej prostriedkov ako horizontálny, keďže nepotrebuje prehľadať taký mohutný korpus. Potrebuje ale dobrú sadu štartovacích adries.
 
@@ -174,9 +176,11 @@ Slúžia na extrahovanie a spracovanie informácii z webových stránok podľa p
 Na extrahovanie a interpretovanie schém, ontológii a  súvislostí medzi informáciami a využívajú technológie ako RDF (Resource Description Framework), OWL (Web Ontology Language) a SPARQL (SPARQL Protocol)\cite{ontologies}.
 
 \subsection{Hĺbkové crawlery}
-Niektoré informácie v internetovom priestore nie sú voľne dostupné pre bežné crawlery. Môže ísť napríklad o privátne siete, platené stránky, stránky s potrebným prihlásením, špecifické protokoly komunikácie. Tieto informácie sú obrazne povedané pod povrchom. Práve z toho vzniklo pomenovanie tejto skupiny. 
+Niektoré informácie v internetovom priestore nie sú voľne dostupné pre bežné crawlery. Môže ísť napríklad o privátne siete, platené stránky, stránky s potrebným prihlásením, špecifické protokoly komunikácie. Tieto informácie sú obrazne povedané pod povrchom. Práve z toho vzniklo pomenovanie tejto skupiny \cite{deepSearch}. 
 
 \section{Použitie Web Crawlera}
+V tejto kapitole sa pozrieme na použitie crawlera v dvoch oblastiach. V komerčnej sfére a vo výskume.
+
 
 \subsection{Použitie v komerčnej sfére}
 Web Crawleri sú dôležitou súčasťou internetových vyhľadávačov, kde slúžia na zozbieranie korpusu webových stránok indexovaných vyhľadávačom. Pri čom nie je dôležitý iba obsah stránok ale aj vzťahy medzi nimi. Okrem toho sa používajú v mnohých ďalších aplikáciách, ktoré spracovávajú veľké množstvá webových stránok, ako sú ťažby dát z webov, porovnávacie nákupné enginy \footnote{ napríklad \url{https://www.heureka.sk/}} (comparison shopping engines). \cite{encykOfDatabases}.  
