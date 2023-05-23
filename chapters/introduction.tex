@@ -6,15 +6,15 @@
 
 \chapter*{Úvod}
 
-S nástupom digitálnej doby sa objem dostupných informácii exponenciálne zväčšuje. Vzniklo množstvo spravodajských webov, publikujúce násobne väčšie množstvo článkov ako ich predchodcovia, printové média. Dokážu sprostredkovať udalosti z celého sveta na minútovej báze. S narastajúcim objemom dát, je za účelom získania vedomostí potrebné efektívne zozbieranie a spracovanie dát. Niekedy to bola úloha knižníc, dnes na to čisto ľudská sila nestačí. Držať krok s digitálnou dobou dokážeme iba ak ju využijeme v náš prospech. Práve program nazývaný web crawler zohráva kľúčovú úlohu pri zbieraní dát zo spravodajských webov. 
+S nástupom digitálnej doby sa objem dostupných informácii exponenciálne zväčšuje. Vzniklo množstvo spravodajských webov, publikujúcich násobne väčšie množstvo článkov než ich predchodcovia - printové média. Dokážu sprostredkovať udalosti z celého sveta na minútovej báze. S narastajúcim objemom dát je za účelom získania vedomostí potrebné efektívne zozbieranie a spracovanie dát. Niekedy to bola úloha knižníc, dnes na to čisto ľudská sila nestačí. Držať krok s digitálnou dobou dokážeme, iba ak ju využijeme v náš prospech. Práve program nazývaný web crawler zohráva kľúčovú úlohu pri zbieraní dát zo spravodajských webov. 
 
-Web crawler umožňuje automatizované zbieranie a organizovanie dát zo širokého spektra zdrojov. Minimalizuje potrebu manuálnej práce, čím ušetrí čas a náklady. Spravodajské weby väčšinou neposkytujú zoznam všetkých ich článkov, tie sú rozptýlené a navzájom po-prepájané odkazmi. Crawler umožňuje automatizovane prejsť túto štruktúru a získať o nej informácie. Teda takto vieme zaznamenať aj vzťahy medzi článkami, nie len ich samotný obsah. 
+Web crawler umožňuje automatizované zbieranie a organizovanie dát zo širokého spektra zdrojov. Minimalizuje potrebu manuálnej práce, čím ušetrí čas a náklady. Spravodajské weby väčšinou neposkytujú zoznam všetkých ich článkov, tie sú rozptýlené a navzájom poprepájané odkazmi. Crawler umožňuje automatizovane prejsť túto štruktúru a získať o nej informácie. Takto teda vieme zaznamenať aj vzťahy medzi článkami, nie len ich samotný obsah. 
 
-Zbieranie takýchto dát otvára možnosť hĺbkovým analýzam. Z extrahovaných informácii vieme analýzou identifikovať vzorce, trendy a korelácie v spravodajstve. To nám poskytne hodnotný náhľad do mediálneho priestoru. Napríklad hodnotenie vplyvu konkrétnych udalostí, odhaľovanie predsudkov, sledovanie šírenia dezinformácií alebo pochopenie nálad verejnosti voči určitým témam. 
+Zbieranie takýchto dát otvára možnosti hĺbkovým analýzam. Z extrahovaných informácii vieme analýzou identifikovať vzorce, trendy a korelácie v spravodajstve. To nám poskytne hodnotný náhľad do mediálneho priestoru. Napríklad hodnotenie vplyvu konkrétnych udalostí, odhaľovanie predsudkov, sledovanie šírenia dezinformácií alebo pochopenie nálad verejnosti voči určitým témam. 
 
-Existuje množstvo dostupných crawlerov. Poväčšine sú ale na účely získania vedomostí z priestoru slovenského spravodajstva príliš robustné a komplexné. Majú vlastnosti, ktoré nepotrebujeme a vyžadujú si priveľké zdroje na prevádzku. Alebo sú jednoduché ale zato málo prispôsobiteľné pre naše potreby. 
+Existuje množstvo dostupných crawlerov. Poväčšine sú ale na účely získania vedomostí z priestoru slovenského spravodajstva príliš robustné a komplexné. Majú vlastnosti, ktoré nepotrebujeme a vyžadujú si priveľké zdroje na prevádzku. Alebo sú síce jednoduché, ale zato málo prispôsobiteľné pre naše potreby. 
 
-Cieľom práce je navrhnutie a implementovanie čo najmenej komplexného crawlera, zbierajúceho dáta zo slovenských spravodajských webov. Musí byť nenáročný na prevádzku a pritom byť nastaviteľný podľa potrieb analýzy. Ako zmena schémy výstupných dát, pridávanie a odoberanie zdrojov. Vlastná implementácia nám dáva možnosť prispôsobiť ho presne pre naše potreby.
+Cieľom práce je navrhnutie a implementovanie čo najmenej komplexného crawlera, zbierajúceho dáta zo slovenských spravodajských webov. Musí byť nenáročný na prevádzku a pritom byť nastaviteľný podľa potrieb analýzy, ako sú zmena schémy výstupných dát, pridávanie a odoberanie zdrojov. Vlastná implementácia nám dáva možnosť prispôsobiť ho presne pre naše potreby.
 
 
 % Základom každej analýzy sú kvalitné dáta. Jedným zo zdrojov takýchto dát sú web stránky, kde sú však rozptýlene a uložené v nevhodnej podobe. Tento problém rieši webový crawler.
@@ -55,12 +55,12 @@ Cieľom práce je návrh a implementácia crawlera, špecializovaného na zber d
     \item Získavanie dát vhodných na analýzu zo spravodajských webov. Konkrétne: titulok, úvodný paragraf, hlavná časť článku, mená autorov, deň vydania, deň poslednej modifikácie.
     \item Paralelizmus - riešenie musí prechádzať stránky paralelne, ale zároveň nesmie zahlcovať web servery.
     \item Odolnosť voči pádom - ak sa vyskytne chyba, nesmie crawler stratiť dáta.
-    \item Redukovanie cieľovej domény - crawler umožnuje nastavovanie filtrovanie stránok na prejdenie.
+    \item Redukovanie cieľovej domény - nastavovania crawlera umožnujú  filtrovanie stránok, určených na prejdenie.
     \item Pridávanie zdrojov - riešenie musí byť navrhnuté tak aby umožnilo jednoduché pridávanie nových domén na extrakciu. 
     \item Nízka komplexita, jednoduché nasadenie a údržba. 
 \end{itemize}
 
 
-Crawler musí byť schopný pár hodinovej až pár dňovej prevádzky. Teda pri vyhodnotení splnenia cieľov práce musíme preskúmať, či crawler nestráca výkon. Crawler teda musí priebežne zbierať štatistiky o trvaní hlavných operácii. Na ich základe určíme trend a závažnosť prípadnej degradácie. 
+Crawler musí byť schopný niekoľko-hodinovej až niekoľko-dňovej prevádzky. Teda pri vyhodnotení splnenia cieľov práce musíme preskúmať, či crawler nestráca výkon. Crawler teda musí priebežne zbierať štatistiky o trvaní hlavných operácii. Na ich základe určíme trend a závažnosť prípadnej degradácie. 
 
-Súčasťou práce bude aj demonštratívne použitie zozbieraných dát pre jednoduchú analýzu v nástroji Apache Spark. Tým overíme, že riešenie zbiera dáta ako sme sformulovali v úlohe.
+Súčasťou práce bude aj demonštratívne použitie zozbieraných dát pre jednoduchú analýzu v nástroji Apache Spark. Tým overíme, že riešenie zbiera dáta tak, ako sme to sformulovali v úlohe.
