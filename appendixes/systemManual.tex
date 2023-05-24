@@ -28,7 +28,7 @@ Modul zodpovedný za ukladanie výsledkov. Vytvorené implementácie sú ukladan
 \end{figure}
 
 \subsection{Modul crawlovania}
-Nejde o samostatnú triedu ale o sadu funkcii, jedna volajúca druhú druhú. Je to jediné miesto paralelizácie a je striktne separované od zvyšku systému. Teda zvyšné moduly vôbec nevedia o paralelizácii a nemusia sa tomu prispôsobovať. Jeho úlohou je pre každú pridelenú adresu vrátiť CrawlResult. Na extrahovanie dát z HTML dokumentu a rozhodnutia či nájdená adresa je v prehľadávanej doméne využíva modul Extraktor. \todo{flow diagram volania tried}
+Nejde o samostatnú triedu ale o sadu funkcii, jedna volajúca druhú druhú. Je to jediné miesto paralelizácie a je striktne separované od zvyšku systému. Teda zvyšné moduly vôbec nevedia o paralelizácii a nemusia sa tomu prispôsobovať. Jeho úlohou je pre každú pridelenú adresu vrátiť CrawlResult. Na extrahovanie dát z HTML dokumentu a rozhodnutia či nájdená adresa je v prehľadávanej doméne využíva modul Extraktor.
 
 \subsection{Extraktor}
 V kóde je nazvaný DomainScraper. Slúži extrahovanie obsahu z HTML dokumentu a na určenie či adresa patrí pod jeho doménu. Každá implementácia je zameraná na jednu doménu. Pre pridanie novej domény na extrakciu je potrebné implementovať interface DomainScraper a pridať ho do zoznamu v objekte (scala alternatíva k java singletonu) SupportedDomains. Pre uľahčenie inicializácie crawlera navrhujeme v budúcnosti nastavovanie SupportedDomains cez CrawlerContext. Pre výber správneho extraktora pre spracovávanú adresú slúži DomainFilter s metódou getDomainScraper. Vzťahy medzi týmito triedami sú vyjadrené diagramom \ref{o:domScraperChart}.
@@ -59,7 +59,7 @@ Je to trieda slúžiaca na injektovanie závislostí crawleru. Teda aby sme mohl
 
 
 \subsection{Logger}
-Pomocný modul, slúžiaci na robenie záznamov o behu programu. Oproti bežnej implementácii umožňuje meranie trvania operácii. Napríklad ako dlho trvá zápis výsledkov. Takto vieme monitorovať priebeh crawlovania, čo je nápomocné pre jeho optimalizáciu a odhaľovanie chýb. \todo{Mozno class diagram ak bude malo miesta}
+Pomocný modul, slúžiaci na robenie záznamov o behu programu. Oproti bežnej implementácii umožňuje meranie trvania operácii. Napríklad ako dlho trvá zápis výsledkov. Takto vieme monitorovať priebeh crawlovania, čo je nápomocné pre jeho optimalizáciu a odhaľovanie chýb.
 
 
 

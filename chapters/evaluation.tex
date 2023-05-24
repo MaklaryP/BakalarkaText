@@ -126,7 +126,7 @@ V tomto ohľade nepovažujeme repozitár za kritický, pretože v každom kroku 
 
 Naopak Url Manažér si musí držať dáta o už navštívených adresách a v každom kroku perzistovať svoj stav. Teda s pribúdajúcimi krokmi, za zväčšuje objem dát v operačnej pamäti a tak isto objem zapisovaný do súborového systému. Na grafe \ref{o:opTimes} vidíme lineárne zvyšovanie trvania operácii Url Manažéra. 
 
-V tabubuľke \ref{t:degr} je znázornené priemerné trvania operácie označovania prejdených adries \todo{Nie je to ta operacie, je to asi pridavanie novych adries} na začiatku behu programu a na konci. A ich podiel oproti priemernej dĺžke samotného crawlovanie v celom behu programu, teda časovo najnáročnejšiu operáciu. Pre behy trvajúce hodiny je to dostačujúce. Ak však potrebujeme crawler spustiť na pár dní, treba zvážiť použitie Url Manažéra s databázovým systémom. Tento problém vieme jednoducho vyriešiť rozdelením celej domény na časti a tie spustiť v samostatných inštanciách crawlera. Týmto vieme docieliť aj distribúciu na viac výpočtových jednotiek. 
+V tabubuľke \ref{t:degr} je znázornené priemerné trvania operácie označovania prejdených adries na začiatku behu programu a na konci. A ich podiel oproti priemernej dĺžke samotného crawlovanie v celom behu programu, teda časovo najnáročnejšiu operáciu. Pre behy trvajúce hodiny je to dostačujúce. Ak však potrebujeme crawler spustiť na pár dní, treba zvážiť použitie Url Manažéra s databázovým systémom. Tento problém vieme jednoducho vyriešiť rozdelením celej domény na časti a tie spustiť v samostatných inštanciách crawlera. Týmto vieme docieliť aj distribúciu na viac výpočtových jednotiek. 
 
 Na obrázku \ref{o:crawlTimeChart} vidíme, že čas samotného crawlovania sa mimo lokálnych výkyvov nemení. Teda paralelná časť programu funguje ako bola navrhnutá. Tak isto to neindikuje blokovanie žiadostí servermi. 
 
@@ -179,11 +179,11 @@ Pre overenie sme pridali stránku z tejto domény ("https://primar.sme.sk/c/2316
 \section{Verifikovanie použiteľnosti dát}
 Cieľom práce je navrhnutie a vytvorenie crawlera na zozbieranie dát zo spravodajských webov pre následnú analýzu v Apache Spark a ďalších produktoch v tomto ekosystéme. Touto podkapitolou overíme, či zozbierané dáta sú vo vhodnej forme a majú výpovednú hodnotu. 
 
-Analytická časť celého procesu nie je cieľom tejto práce, preto na demonštráciu splnenia cieľa použijeme iba primitívnu backlink analýzu, implementovanú kódom \ref{code:backlink} v Apache Spark. Pomocou nej sme identifikovali 1000 najviac odkazovaných článkov. Z tohto zoradenia vieme vyčítať najdôveryhodnejšie alebo aktuálne odporúčané články. Ukážka výstupu je na obrázku \ref{o:analRes}\todo{doplnit vysledny subor do vysledkov k 10 gb dat}.
+Analytická časť celého procesu nie je cieľom tejto práce, preto na demonštráciu splnenia cieľa použijeme iba primitívnu analýzu analýza spätných odkazov, implementovanú kódom \ref{code:backlink} v Apache Spark. Pomocou nej sme identifikovali 1000 najviac odkazovaných článkov. Z tohto zoradenia vieme vyčítať najdôveryhodnejšie alebo aktuálne odporúčané články. Ukážka výstupu je na obrázku \ref{o:analRes}.
 
 Dáta sme úspešne analyzovali a nevyskytli sa žiadne problémy. Myslíme, si že sú vhodné aj na zložitejšie analýzy. Preto považujeme tento cieľ práce za splnený.
 
-\begin{lstlisting}[language=Scala,caption={Primitívna backlink analýza v Apache Spark}]
+\begin{lstlisting}[language=Scala,caption={Primitívna analýza spätných odkazov v Apache Spark}]
 val df = spark.read
   .option("header", "true")
   .csv(files: _*)
